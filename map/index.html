@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수도권 개발계획 추적 지도</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  #map { height: 100%; width: 100%; }
+  .legend {
+    position: absolute; bottom: 20px; left: 10px; z-index: 1000;
+    background: white; padding: 10px 14px; border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.3); font-size: 13px; line-height: 1.6;
+  }
+  .legend span.dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: 6px; vertical-align: middle;
+  }
+  .popup-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .popup-row { font-size: 12.5px; color: #333; margin: 2px 0; }
+  .popup-link { font-size: 12.5px; color: #2563eb; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="legend">
+  <div><span class="dot" style="background:#2563eb"></span>3기신도시</div>
+  <div><span class="dot" style="background:#dc2626"></span>GTX</div>
+  <div><span class="dot" style="background:#059669"></span>1기선도지구</div>
+  <div><span class="dot" style="background:#d97706"></span>정비사업</div>
+  <div><span class="dot" style="background:#7c3aed"></span>광역계획</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([37.45, 127.0], 10);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  fetch('../geo/plans.geojson')
+    .then(res => res.json())
+    .then(data => {
+      const layer = L.geoJSON(data, {
+        pointToLayer: (feature, latlng) => {
+          const color = feature.properties.color || '#6b7280';
+          return L.circleMarker(latlng, {
+            radius: 8,
+            fillColor: color,
+            color: '#fff',
+            weight: 1.5,
+            fillOpacity: 0.9
+          });
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties;
+          const rows = [
+            ['근거법률', p.law_basis],
+            ['지역', p.region],
+            ['단계', p.stage_name || p.stage_code],
+            ['단계일', p.stage_date],
+            ['최종수정', p.last_updated],
+            ['비고', p.note],
+          ].filter(([, v]) => v && v !== 'TBD');
+
+          const rowsHtml = rows.map(([k, v]) =>
+            `<div class="popup-row"><b>${k}</b>: ${v}</div>`).join('');
+          const link = p.source_url
+            ? `<div class="popup-link"><a href="${p.source_url}" target="_blank" rel="noopener">출처 링크</a></div>`
+            : '';
+
+          layer.bindPopup(
+            `<div class="popup-title">${p.name || p.id}</div>${rowsHtml}${link}`
+          );
+        }
+      }).addTo(map);
+
+      if (data.features.length) {
+        map.fitBounds(layer.getBounds(), { padding: [30, 30] });
+      }
+    })
+    .catch(err => {
+      console.error('geojson 로드 실패', err);
+      document.getElementById('map').insertAdjacentHTML(
+        'beforeend',
+        '<div style="position:absolute;top:10px;left:10px;background:#fee;padding:10px;border-radius:6px;">geo/plans.geojson 을 불러오지 못했습니다. tools/build_geo.py 를 먼저 실행했는지 확인하세요.</div>'
+      );
+    });
+</script>
+</body>
+</html>

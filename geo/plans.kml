@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>수도권 개발계획 추적</name>
+    <Placemark>
+      <name>남양주왕숙1 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 남양주시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅 - Claude 업데이트 루프에서 실제 단계/출처 채울 것</description>
+      <Point><coordinates>127.2075,37.6255,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>남양주왕숙2 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 남양주시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>127.179,37.647,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>하남교산 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 하남시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>127.1745,37.5305,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>인천계양 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 인천 계양구
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.728,37.5895,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>고양창릉 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 고양시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.867,37.639,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부천대장 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 부천시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.769,37.576,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>안산장상 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 안산시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.846,37.339,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>광명시흥 공공주택지구</name>
+      <description>category: 3기신도시
+law_basis: PHZ
+region: 경기 광명시·시흥시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.834,37.438,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>GTX-A 노선</name>
+      <description>category: GTX
+law_basis: TRN
+region: 수도권 광역
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅 - 대표좌표는 성남역 기준</description>
+      <Point><coordinates>127.131,37.456,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>GTX-B 노선</name>
+      <description>category: GTX
+law_basis: TRN
+region: 수도권 광역
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅 - 대표좌표는 용산역 기준</description>
+      <Point><coordinates>126.927,37.5205,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>GTX-C 노선</name>
+      <description>category: GTX
+law_basis: TRN
+region: 수도권 광역
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅 - 대표좌표는 삼성역 기준</description>
+      <Point><coordinates>127.049,37.5045,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>분당 1기 선도지구</name>
+      <description>category: 1기선도지구
+law_basis: OLD
+region: 경기 성남시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>127.1085,37.3595,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>일산 1기 선도지구</name>
+      <description>category: 1기선도지구
+law_basis: OLD
+region: 경기 고양시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.769,37.6785,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>평촌 1기 선도지구</name>
+      <description>category: 1기선도지구
+law_basis: OLD
+region: 경기 안양시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.9515,37.3935,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산본 1기 선도지구</name>
+      <description>category: 1기선도지구
+law_basis: OLD
+region: 경기 군포시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.935,37.36,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>중동 1기 선도지구</name>
+      <description>category: 1기선도지구
+law_basis: OLD
+region: 경기 부천시
+stage_code: TBD
+stage_name: TBD
+stage_date: TBD
+last_updated: 2026-07-05
+note: 최초 세팅</description>
+      <Point><coordinates>126.766,37.489,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>
