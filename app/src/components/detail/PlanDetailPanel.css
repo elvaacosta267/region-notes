@@ -89,6 +89,12 @@
   margin: 0;
 }
 
+.plan-detail__dev-stats-hint {
+  opacity: 0.65;
+  font-size: 11px;
+  margin: 0 0 6px;
+}
+
 .plan-detail__links {
   display: flex;
   gap: 12px;

@@ -11,6 +11,7 @@ const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanF
   { key: "C_delay", basisKey: "C_delay_basis", label: "C. 지연여부" },
   { key: "D_infra", basisKey: "D_infra_basis", label: "D. 인프라연계" },
   { key: "E_price_attractiveness", basisKey: "E_price_attractiveness_basis", label: "E. 투자금 매력도" },
+  { key: "F_upside_potential", basisKey: "F_upside_potential_basis", label: "F. 잔여 개발이익 여력" },
 ];
 
 export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
@@ -53,6 +54,31 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           ))}
         </tbody>
       </table>
+
+      {p.구역면적 && (
+        <div className="plan-detail__dev-stats">
+          <p className="plan-detail__dev-stats-hint">
+            개발이익 참고정보 — 조합원 추정분담금(로그인 전용, 미공개)이 아니라 공개
+            사업개요입니다. 초기단계 사업은 세대수·용적률이 아직 미확정일 수 있습니다.
+          </p>
+          <dl className="plan-detail__fields">
+            <dt>구역면적 / 건축면적</dt>
+            <dd>{p.구역면적}㎡{p.건축면적 && ` / ${p.건축면적}㎡`}</dd>
+            {p.세대수 && (
+              <>
+                <dt>동수 / 세대수</dt>
+                <dd>{p.동수}개동 / {p.세대수}세대</dd>
+              </>
+            )}
+            {p.건폐율 && (
+              <>
+                <dt>건폐율 / 용적률</dt>
+                <dd>{p.건폐율}% / {p.용적률}%</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      )}
 
       <dl className="plan-detail__fields">
         <dt>대략가격대</dt>

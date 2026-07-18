@@ -9,6 +9,7 @@ const LABELS: Record<keyof FeasibilityWeights, string> = {
   C_delay: "지연여부",
   D_infra: "인프라연계",
   E_price_attractiveness: "투자금 매력도",
+  F_upside_potential: "잔여 개발이익 여력",
 };
 
 export function WeightPanel() {
