@@ -1,0 +1,97 @@
+.ranking-table__wrap {
+  overflow: auto;
+  height: 100%;
+}
+
+.ranking-table__count {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ranking-table th {
+  position: sticky;
+  top: 0;
+  background: var(--table-head-bg, #1a1a1a);
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border, #333);
+  white-space: nowrap;
+}
+
+.ranking-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-faint, #2a2a2a);
+  white-space: nowrap;
+}
+
+.ranking-table tbody tr {
+  cursor: pointer;
+}
+
+.ranking-table tbody tr:hover {
+  background: var(--row-hover, rgba(127, 127, 127, 0.1));
+}
+
+.ranking-table__row--selected {
+  background: var(--row-selected, rgba(37, 99, 235, 0.15));
+}
+
+.ranking-table__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.ranking-table__dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ranking-table__score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.ranking-table__grade {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.grade--high {
+  background: #059669;
+  color: white;
+}
+
+.grade--mid {
+  background: #d97706;
+  color: white;
+}
+
+.grade--low {
+  background: #6b7280;
+  color: white;
+}
+
+.ranking-table__link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.ranking-table__link:hover {
+  text-decoration: underline;
+}
