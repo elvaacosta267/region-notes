@@ -86,10 +86,17 @@
   color: white;
 }
 
+.ranking-table__links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .ranking-table__link {
   color: #2563eb;
   text-decoration: none;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .ranking-table__link:hover {

@@ -12,7 +12,10 @@ function App() {
   const { data, isLoading, error } = usePlansData();
   const selectedId = useRankingStore((s) => s.selectedId);
 
-  const features = useMemo(() => data?.features ?? [], [data]);
+  const features = useMemo(
+    () => (data?.features ?? []).filter((f) => f.properties.시군구 === "부평구"),
+    [data]
+  );
   const selectedFeature = useMemo(
     () => features.find((f) => f.properties.id === selectedId) ?? null,
     [features, selectedId]

@@ -106,6 +106,11 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
 정비사업. Add new plans with the next unused number in the relevant range, or start a new range.
 
 ### React app structure
+- `App.tsx` filters `usePlansData()`'s features down to `시군구 === "부평구"` before passing them
+  to `RankingTable`/`MapView` — `geo/plans.geojson` still carries the earlier 수도권 pilot rows
+  (3기 신도시/GTX/1기 신도시 선도지구, `P001`–`P205`) alongside the 부평구 rows, since `db/plans.csv`
+  is a shared source of truth across pilots, not a per-app dataset. If you add another region's
+  app, filter here rather than trimming the CSV.
 - `components/map/MapView.tsx` deliberately isolates all Leaflet/react-leaflet-specific code.
   Filtering, scoring, and state live outside it (`lib/`, `store/`) so swapping the map library
   later (e.g. to Kakao Maps for better Korean address precision) only means rewriting this one
@@ -116,9 +121,13 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   `RankingTable` and `MapView`/`PlanDetailPanel` call it independently with the same weights from
   the store, rather than passing a pre-computed score down — keep it that way so re-weighting
   stays consistent everywhere.
-- `lib/hogangnonoLink.ts` generates a `site:hogangnono.com` Google-search deep link rather than
-  a guessed hogangnono.com internal search URL — 호갱노노 has no public API and its search is
-  behind a signup-gated SPA, so this is the only reliably-working link format.
+- `lib/hogangnonoLink.ts` and `lib/naverLandLink.ts` both generate `site:<domain>` Google-search
+  deep links rather than a guessed internal search URL — neither 호갱노노 nor 네이버부동산 has a
+  public API and both search UIs are SPA-routed (호갱노노's is also signup-gated), so this is the
+  only reliably-working link format. Both call the shared `lib/planSearchName.ts` first, which
+  strips plans.csv's internal classification suffixes (`" / 정비구역후보지(23년 2차)"`,
+  `"(현지개량)"`) from `사업명` — leaving them in the query returns zero Google results even for
+  plans that do have real listings.
 - `lib/types.ts` mirrors `geo/plans.geojson`'s `properties` shape field-for-field (Korean field
   names included). This exists specifically to catch schema drift between `db/plans.csv` and the
   frontend at compile time — a real bug (mismatched `lat`/`lon` vs `lat`/`lng` column names) once
