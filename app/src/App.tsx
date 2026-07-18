@@ -42,10 +42,11 @@ function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <h1>인천 부평구 정비사업 실현가능성 순위표</h1>
+        <h1>인천 부평구 정비사업 투자매력도 순위표</h1>
         <p className="app__subtitle">
-          1982년~현재 국토종합계획·수도권정비계획 위계 속에서 부평구 정비사업의
-          실현가능성을 A~F 6요소로 스코어링합니다. 실거래가·갭투자 분석은{" "}
+          1982년~현재 국토종합계획·수도권정비계획 위계 속에서 부평구 정비사업의 투자
+          매력도(쌀수록, 기대이익이 클수록, 실현이 빠를수록 높은 점수)를 A~F 6요소로
+          스코어링합니다. 실거래가·갭투자 분석은{" "}
           <a href="https://hogangnono.com" target="_blank" rel="noopener noreferrer">
             호갱노노
           </a>

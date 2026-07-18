@@ -17,6 +17,11 @@ price data and gap-investment (갭투자) calculation are deliberately **not** b
 already does that well; this project's differentiation is scoring feasibility against the
 historical hierarchy of national/regional plans (see `db/schema.md`'s "우선순위 판단의 2단 구조").
 
+The app's stated purpose is **investment attractiveness (투자 매력도), not feasibility per se** —
+"실현가능성이 높다" (likely to happen) and "매력적인 투자처다" (worth buying) are different
+questions, and the ranking optimizes for the latter. See the "Feasibility scoring" section below
+for how the six factors are weighted to reflect that.
+
 ## Commands
 
 ### Data pipeline (Python, stdlib only — no venv/pip install needed)
@@ -40,6 +45,23 @@ REST 주소 검색 API to parcel-level coordinates, leaving a row's existing lat
 Kakao returns no match (never fabricates a coordinate). `KAKAO_REST_API_KEY` comes from a
 gitignored `.env` at the repo root (Kakao Developers app → "플랫폼 키" → REST API 키; the Maps
 product must be enabled on the app first or the API returns `OPEN_MAP_AND_LOCAL` disabled).
+
+### One-off development-scale scraping (`tools/scrape_dev_stats.py`)
+```bash
+python3 tools/scrape_dev_stats.py  # fills 구역면적/건축면적/동수/세대수/건폐율/용적률
+python3 tools/build_geo.py
+```
+Pulls public "사업개요" data (site area, floor area, unit count, 건폐율/용적률) from the same
+인천시 추정분담금 정보시스템 used elsewhere, via its `pop_overview.do` popup — no login needed.
+**Do not extend this to scrape actual 추정분담금 (per-member assessment fee) figures** — that's
+behind a real 조합원(union-member) login gate on the same site (`정보공개(조합원전용)`), tied to
+individual members' 권리가액, and is not public data regardless of how it's fetched.
+`ARA_ID_BY_PLAN_ID` was hand-collected by matching 사업명 across the site's paginated list (see
+git history for the exact browser session) — there's no stable public API to derive it
+generically, so re-collecting it for newly-added plans means repeating that matching by hand.
+The source site emits `0`/`1` placeholders instead of blanks for undetermined fields on
+early-stage (정비구역후보지 등) projects; `clean_stats()` filters the placeholder pattern out
+rather than storing it as if it were real data — don't remove that filter to "get more data".
 
 ### React app (`app/`)
 ```bash
@@ -101,10 +123,16 @@ The design intent: A (진척률) measures certainty/risk, but a further-along pr
 most of its price appreciation priced in — certainty and remaining upside move in *opposite*
 directions, not the same one. Before F existed, the default weights let A dominate, so 착공/준공
 (construction-started/completed) projects swept the top of the ranking purely for being
-low-risk, even though they had the least room left to grow. Giving F equal default weight to A
-(`DEFAULT_WEIGHTS` in `lib/types.ts`) keeps both axes in the same single ranked table rather than
-splitting into separate "safe" and "growth" tables — don't let A silently regain dominance by
-raising its default weight without also raising F's.
+low-risk, even though they had the least room left to grow.
+
+`DEFAULT_WEIGHTS` (`lib/types.ts`) encodes an explicit priority order for "매력도", not just
+"weights that summed to 1": **E (price) > F (upside) > A (speed) >> B/C/D (risk filters)**. B/C/D
+(예타·지연·인프라) exist to catch plans that are structurally unlikely to ever complete, not to
+reward plans for being far along — that's what A is for, and A itself is intentionally kept
+*below* E/F so a further-along-but-already-expensive plan doesn't outrank a cheaper
+earlier-stage one. If you touch these defaults, keep E ≥ F ≥ A and keep B/C/D noticeably lower
+than all three — collapsing them back toward equal weights silently reverts the ranking to
+"certainty = attractiveness", which is the framing this project explicitly moved away from.
 
 `E_price_attractiveness` is derived from the manually-entered `대략가격대` column (no real-
 transaction API integration) — see `db/schema.md`'s "대략가격대 작성 원칙" for the tier mapping
@@ -152,6 +180,13 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   design, not a secret, but every domain that serves the app (`localhost:5173` for dev,
   `elvaacosta267.github.io` for prod) must be registered under the Kakao Developers app's
   "플랫폼 키" → Web platform settings or the SDK silently fails to authenticate.
+  Markers are still points, not parcel-shaped polygons (a real 아파트 단지 renders as a circle
+  floating over it, not an outline matching its actual footprint) — this was explicitly requested
+  and explicitly deferred, not overlooked. Kakao's Maps JS SDK doesn't expose 지적도(cadastral)
+  polygon geometry through a free key; doing this properly needs a separate polygon data source
+  (e.g. VWorld's 지적편집도 API, itself a separate free-signup key) plus rendering via
+  `kakao.maps.Polygon` instead of `CustomOverlay`. Don't approximate a polygon from the point +
+  a guessed radius — that would look precise while being fabricated.
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both

@@ -24,6 +24,16 @@ export interface PlanProperties {
   대략가격대: string;
   color: string;
 
+  // 개발이익 참고용 규모 정보 — 부평구 재개발/재건축에만 있고 나머지는 빈 문자열.
+  // 실제 조합원 추정분담금이 아니라 공개 사업개요(면적·세대수·용적률)일 뿐이다.
+  // tools/scrape_dev_stats.py, db/schema.md 참고.
+  구역면적: string; // 단위 ㎡
+  건축면적: string; // 단위 ㎡
+  동수: string;
+  세대수: string;
+  건폐율: string;
+  용적률: string;
+
   A_stage_progress: number;
   A_stage_progress_basis: string;
   B_pretest: number;
@@ -72,17 +82,19 @@ export interface FeasibilityWeights {
   F_upside_potential: number;
 }
 
-// A(확실성)와 F(잔여 개발이익 여력)는 서로 반대 방향으로 움직이는 별개의 축이라 동일
-// 가중치를 준다 — "실현가능성"과 "상승여력"을 하나의 순위표 안에서 같이 반영하기 위함
-// (진척률이 높을수록 안전하지만 이미 가격에 반영돼 상승여력은 작다는 전제, F_upside_potential
-// 은 1 - A_stage_progress 로 계산됨, tools/feasibility.py 참고).
+// 이 앱의 목적은 "실현가능성 자체"가 아니라 "투자 매력도"다 — 매력도는
+// (1) 쌀수록 좋고(E) (2) 싼 것 중에서도 기대이익(잔여 상승여력)이 높을수록
+// 좋고(F) (3) 그 중에서도 실현이 빠를수록 좋다(A)는 우선순위를 가진다.
+// B/C/D(예타·지연·인프라)는 매력도를 끌어올리는 요소가 아니라 "이 사업이
+// 무산되지 않을까"를 거르는 리스크 필터라서 가중치를 낮게 둔다 — A를 B/C/D와
+// 동급으로 취급하면 다시 "확실성이 곧 매력도"로 되돌아가 버리므로 주의.
 export const DEFAULT_WEIGHTS: FeasibilityWeights = {
-  A_stage_progress: 0.2,
-  B_pretest: 0.2,
-  C_delay: 0.15,
-  D_infra: 0.1,
-  E_price_attractiveness: 0.15,
-  F_upside_potential: 0.2,
+  A_stage_progress: 0.15,
+  B_pretest: 0.15,
+  C_delay: 0.1,
+  D_infra: 0.05,
+  E_price_attractiveness: 0.3,
+  F_upside_potential: 0.25,
 };
 
 export type Grade = "상" | "중" | "하";
