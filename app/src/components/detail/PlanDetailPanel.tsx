@@ -1,6 +1,7 @@
 import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { hogangnonoSearchUrl } from "../../lib/hogangnonoLink";
+import { naverLandSearchUrl } from "../../lib/naverLandLink";
 import { useRankingStore } from "../../store/rankingStore";
 import "./PlanDetailPanel.css";
 
@@ -78,6 +79,9 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         )}
         <a href={hogangnonoSearchUrl(p.사업명)} target="_blank" rel="noopener noreferrer">
           호갱노노에서 확인 ↗
+        </a>
+        <a href={naverLandSearchUrl(p.사업명)} target="_blank" rel="noopener noreferrer">
+          네이버부동산에서 확인 ↗
         </a>
       </div>
     </div>
