@@ -10,7 +10,7 @@ import "./MapView.css";
 
 // 인천 부평구 중심 근사 좌표 (파일럿 지역 기본 뷰)
 const BUPYEONG_CENTER = { lat: 37.5, lng: 126.72 };
-const DEFAULT_LEVEL = 8; // 카카오맵 레벨: 숫자가 작을수록 확대
+const DEFAULT_LEVEL = 10; // 카카오맵 레벨: 숫자가 작을수록 확대. 정확한 위치보다 "대충 인천 어디쯤"이 목적이라 넓게 잡음
 const SELECTED_LEVEL = 3;
 
 function scoreToDiameter(score: number): number {

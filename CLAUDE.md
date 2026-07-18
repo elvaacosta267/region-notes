@@ -193,13 +193,17 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   `RankingTable` and `MapView`/`PlanDetailPanel` call it independently with the same weights from
   the store, rather than passing a pre-computed score down — keep it that way so re-weighting
   stays consistent everywhere.
-- `lib/hogangnonoLink.ts` and `lib/naverLandLink.ts` both generate `site:<domain>` Google-search
-  deep links rather than a guessed internal search URL — neither 호갱노노 nor 네이버부동산 has a
-  public API and both search UIs are SPA-routed (호갱노노's is also signup-gated), so this is the
-  only reliably-working link format. Both call the shared `lib/planSearchName.ts` first, which
-  strips plans.csv's internal classification suffixes (`" / 정비구역후보지(23년 2차)"`,
-  `"(현지개량)"`) from `사업명` — leaving them in the query returns zero Google results even for
-  plans that do have real listings.
+- `lib/naverSearchLink.ts` generates a plain `search.naver.com` query — this replaced an earlier
+  approach (`site:hogangnono.com` / `site:new.land.naver.com` Google searches) that turned out
+  unreliable in practice: Google barely indexes `new.land.naver.com` at all (near-empty results
+  even for common apartment names), and even where it did index something it would silently
+  fall back to unrelated pages sharing a keyword instead of saying "no results." Naver's own
+  search always returns HTTP 200 with either relevant results or an honest empty state, so it's
+  the more robust fallback even though it can't deep-link into either site specifically. Don't
+  reintroduce the site-restricted Google approach without solving that reliability gap. It still
+  calls `lib/planSearchName.ts` first, which strips plans.csv's internal classification suffixes
+  (`" / 정비구역후보지(23년 2차)"`, `"(현지개량)"`) from `사업명` — leaving them in the query
+  pollutes the search for plans that do have real listings.
 - `lib/types.ts` mirrors `geo/plans.geojson`'s `properties` shape field-for-field (Korean field
   names included). This exists specifically to catch schema drift between `db/plans.csv` and the
   frontend at compile time — a real bug (mismatched `lat`/`lon` vs `lat`/`lng` column names) once
