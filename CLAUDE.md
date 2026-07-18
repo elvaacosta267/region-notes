@@ -129,10 +129,19 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   unit (공공시설 건립형 도시재생사업, GTX/공공주택지구 등), so they're excluded from the
   investment ranking outright rather than shown with a neutral score (a completed/무지연 project
   can still max out A/B/C and rank #1 even with nothing to buy — see `db/plans.csv`'s `P303`).
-- `components/map/MapView.tsx` deliberately isolates all Leaflet/react-leaflet-specific code.
-  Filtering, scoring, and state live outside it (`lib/`, `store/`) so swapping the map library
-  later (e.g. to Kakao Maps for better Korean address precision) only means rewriting this one
-  file.
+- `components/map/MapView.tsx` deliberately isolates all map-library-specific code — originally
+  Leaflet/react-leaflet, now Kakao Maps JS SDK (swapped for accurate Korean address/parcel
+  handling and to drop the OSM tile layer's cluttered default POI icons). Filtering, scoring, and
+  state live outside it (`lib/`, `store/`) so swapping the library again only means rewriting this
+  one file. The SDK loads as a global `<script>` tag (`lib/kakaoMapLoader.ts`, keyed by
+  `VITE_KAKAO_JS_KEY`) rather than an npm import, since Kakao doesn't publish one; markers are
+  `kakao.maps.CustomOverlay` divs (not `kakao.maps.Marker`) so they can keep the existing
+  color-by-category / size-by-score visual language. `VITE_KAKAO_JS_KEY` comes from
+  `app/.env.local` locally (gitignored) and the `VITE_KAKAO_JS_KEY` GitHub Actions repo variable
+  in CI (`.github/workflows/deploy.yml`) — it's a public, domain-whitelisted key by Kakao's own
+  design, not a secret, but every domain that serves the app (`localhost:5173` for dev,
+  `elvaacosta267.github.io` for prod) must be registered under the Kakao Developers app's
+  "플랫폼 키" → Web platform settings or the SDK silently fails to authenticate.
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both
