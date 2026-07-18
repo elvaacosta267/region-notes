@@ -110,7 +110,11 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   to `RankingTable`/`MapView` — `geo/plans.geojson` still carries the earlier 수도권 pilot rows
   (3기 신도시/GTX/1기 신도시 선도지구, `P001`–`P205`) alongside the 부평구 rows, since `db/plans.csv`
   is a shared source of truth across pilots, not a per-app dataset. If you add another region's
-  app, filter here rather than trimming the CSV.
+  app, filter here rather than trimming the CSV. The same filter also drops any row whose
+  `대략가격대` starts with `"해당없음"` — those are plans that structurally produce no sellable
+  unit (공공시설 건립형 도시재생사업, GTX/공공주택지구 등), so they're excluded from the
+  investment ranking outright rather than shown with a neutral score (a completed/무지연 project
+  can still max out A/B/C and rank #1 even with nothing to buy — see `db/plans.csv`'s `P303`).
 - `components/map/MapView.tsx` deliberately isolates all Leaflet/react-leaflet-specific code.
   Filtering, scoring, and state live outside it (`lib/`, `store/`) so swapping the map library
   later (e.g. to Kakao Maps for better Korean address precision) only means rewriting this one
