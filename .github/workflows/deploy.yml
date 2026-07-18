@@ -30,6 +30,8 @@ jobs:
       - name: Build (includes geo/plans.geojson sync)
         run: npm run build
         working-directory: app
+        env:
+          VITE_KAKAO_JS_KEY: ${{ vars.VITE_KAKAO_JS_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist

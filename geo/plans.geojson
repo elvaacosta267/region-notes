@@ -678,8 +678,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.704434,
+          37.489886
         ]
       },
       "properties": {
@@ -720,8 +720,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.701273,
+          37.503595
         ]
       },
       "properties": {
@@ -762,8 +762,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7124,
-          37.4841
+          126.712842,
+          37.485805
         ]
       },
       "properties": {
@@ -804,8 +804,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.700174,
+          37.474092
         ]
       },
       "properties": {
@@ -846,8 +846,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.693,
-          37.515
+          126.715252,
+          37.50505
         ]
       },
       "properties": {
@@ -888,8 +888,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.693,
-          37.515
+          126.703346,
+          37.517966
         ]
       },
       "properties": {
@@ -930,8 +930,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.702078,
+          37.512473
         ]
       },
       "properties": {
@@ -972,8 +972,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.748,
-          37.4808
+          126.742738,
+          37.484671
         ]
       },
       "properties": {
@@ -1014,8 +1014,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.695519,
+          37.472361
         ]
       },
       "properties": {
@@ -1056,8 +1056,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.696301,
+          37.468684
         ]
       },
       "properties": {
@@ -1098,8 +1098,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.699371,
+          37.480631
         ]
       },
       "properties": {
@@ -1140,8 +1140,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.702019,
+          37.476795
         ]
       },
       "properties": {
@@ -1182,8 +1182,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.710288,
+          37.487693
         ]
       },
       "properties": {
@@ -1224,8 +1224,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7331,
-          37.5214
+          126.736471,
+          37.518333
         ]
       },
       "properties": {
@@ -1266,8 +1266,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.696806,
+          37.503301
         ]
       },
       "properties": {
@@ -1308,8 +1308,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.702068,
+          37.506496
         ]
       },
       "properties": {
@@ -1350,8 +1350,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.703735,
+          37.497014
         ]
       },
       "properties": {
@@ -1411,9 +1411,9 @@
         "단계상세": "인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과",
         "지연여부": "N",
         "예타상태": "해당없음(도시정비법 조합사업, 예타 비대상)",
-        "최근확인일": "2026-07-18",
+        "최근확인일": "2026-07-19",
         "출처URL": "https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do",
-        "비고": "대표지번: 산곡동 10번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증",
+        "비고": "대표지번: 산곡동 10번지 일원. 카카오 지오코딩 시도했으나 '산곡동 10' 주소 매칭 실패(지번 통폐합 추정) — 다른 산곡동 사업들과 달리 여전히 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증",
         "인프라연계id": "",
         "대략가격대": "2억~3억(추정)",
         "color": "#d97706",
@@ -1434,8 +1434,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.704259,
+          37.490943
         ]
       },
       "properties": {
@@ -1476,8 +1476,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.69785,
+          37.502864
         ]
       },
       "properties": {
@@ -1518,8 +1518,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.733321,
+          37.497267
         ]
       },
       "properties": {
@@ -1560,8 +1560,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7033,
-          37.5122
+          126.709604,
+          37.488862
         ]
       },
       "properties": {
@@ -1602,8 +1602,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.72273,
+          37.48371
         ]
       },
       "properties": {
@@ -1644,8 +1644,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.715551,
+          37.486635
         ]
       },
       "properties": {
@@ -1686,8 +1686,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7443,
-          37.488
+          126.735495,
+          37.499434
         ]
       },
       "properties": {
@@ -1728,8 +1728,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7443,
-          37.488
+          126.740398,
+          37.483771
         ]
       },
       "properties": {
@@ -1770,8 +1770,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7443,
-          37.488
+          126.735981,
+          37.503342
         ]
       },
       "properties": {
@@ -1812,8 +1812,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.6942,
-          37.4784
+          126.704591,
+          37.473392
         ]
       },
       "properties": {
@@ -1854,8 +1854,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.731175,
+          37.486449
         ]
       },
       "properties": {
@@ -1896,8 +1896,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7241,
-          37.4897
+          126.731106,
+          37.488794
         ]
       },
       "properties": {
@@ -1938,8 +1938,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7223,
-          37.5157
+          126.72808,
+          37.519098
         ]
       },
       "properties": {
@@ -1980,8 +1980,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7223,
-          37.5157
+          126.72808,
+          37.519098
         ]
       },
       "properties": {
@@ -2022,8 +2022,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          126.7223,
-          37.5157
+          126.727906,
+          37.521651
         ]
       },
       "properties": {

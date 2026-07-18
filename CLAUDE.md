@@ -27,6 +27,20 @@ python3 tools/test_build_geo.py   # smoke test (unittest); run after every plans
 Run `build_geo.py` after any edit to `db/plans.csv` or `db/stage_sequences.json` — the GeoJSON
 is a build artifact, not hand-edited.
 
+### One-off geocoding (`tools/geocode_kakao.py`)
+```bash
+export $(cat .env | xargs)        # loads KAKAO_REST_API_KEY
+python3 tools/geocode_kakao.py     # rewrites lat/lng for 시군구=부평구 rows in-place
+python3 tools/build_geo.py        # regenerate GeoJSON/KML from the updated CSV
+```
+`db/plans.csv`'s 부평구 rows originally shared a handful of dong-level approximate
+coordinates (multiple redevelopment zones in the same 동 plotted on top of each other on the
+map). This script re-geocodes each row from its `비고` field's `"대표지번: ..."` text via Kakao's
+REST 주소 검색 API to parcel-level coordinates, leaving a row's existing lat/lng untouched if
+Kakao returns no match (never fabricates a coordinate). `KAKAO_REST_API_KEY` comes from a
+gitignored `.env` at the repo root (Kakao Developers app → "플랫폼 키" → REST API 키; the Maps
+product must be enabled on the app first or the API returns `OPEN_MAP_AND_LOCAL` disabled).
+
 ### React app (`app/`)
 ```bash
 cd app
@@ -115,10 +129,19 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   unit (공공시설 건립형 도시재생사업, GTX/공공주택지구 등), so they're excluded from the
   investment ranking outright rather than shown with a neutral score (a completed/무지연 project
   can still max out A/B/C and rank #1 even with nothing to buy — see `db/plans.csv`'s `P303`).
-- `components/map/MapView.tsx` deliberately isolates all Leaflet/react-leaflet-specific code.
-  Filtering, scoring, and state live outside it (`lib/`, `store/`) so swapping the map library
-  later (e.g. to Kakao Maps for better Korean address precision) only means rewriting this one
-  file.
+- `components/map/MapView.tsx` deliberately isolates all map-library-specific code — originally
+  Leaflet/react-leaflet, now Kakao Maps JS SDK (swapped for accurate Korean address/parcel
+  handling and to drop the OSM tile layer's cluttered default POI icons). Filtering, scoring, and
+  state live outside it (`lib/`, `store/`) so swapping the library again only means rewriting this
+  one file. The SDK loads as a global `<script>` tag (`lib/kakaoMapLoader.ts`, keyed by
+  `VITE_KAKAO_JS_KEY`) rather than an npm import, since Kakao doesn't publish one; markers are
+  `kakao.maps.CustomOverlay` divs (not `kakao.maps.Marker`) so they can keep the existing
+  color-by-category / size-by-score visual language. `VITE_KAKAO_JS_KEY` comes from
+  `app/.env.local` locally (gitignored) and the `VITE_KAKAO_JS_KEY` GitHub Actions repo variable
+  in CI (`.github/workflows/deploy.yml`) — it's a public, domain-whitelisted key by Kakao's own
+  design, not a secret, but every domain that serves the app (`localhost:5173` for dev,
+  `elvaacosta267.github.io` for prod) must be registered under the Kakao Developers app's
+  "플랫폼 키" → Web platform settings or the SDK silently fails to authenticate.
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both

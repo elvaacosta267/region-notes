@@ -3,12 +3,10 @@
   height: 100%;
 }
 
-.map-view__popup {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.map-view__popup-title {
-  font-weight: 700;
-  margin-bottom: 2px;
+.map-view__marker {
+  border-radius: 50%;
+  border-style: solid;
+  box-sizing: border-box;
+  cursor: pointer;
+  opacity: 0.85;
 }
