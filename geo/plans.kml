@@ -1,198 +1,830 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>수도권 개발계획 추적</name>
+    <name>국토개발계획 투자포인트 추적</name>
     <Placemark>
-      <name>남양주왕숙1 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 남양주시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅 - Claude 업데이트 루프에서 실제 단계/출처 채울 것</description>
-      <Point><coordinates>127.2075,37.6255,0</coordinates></Point>
-    </Placemark>
-    <Placemark>
-      <name>남양주왕숙2 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 남양주시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>127.179,37.647,0</coordinates></Point>
+      <name>남양주왕숙 공공주택지구</name>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 남양주시
+읍면동: 진접읍·진건읍 일원
+현재단계: 조성공사
+단계상세: 주택 블록별 공정률 0~1%대(2025.11 기준) 2026 본격 착공
+지연여부: Y(입주 2026→2028상 연기)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://www.molit.go.kr/policy/capital/cap_e_03.jsp
+최근확인일: 2026-07-05
+비고: 3기 신도시 최대 규모</description>
+      <Point><coordinates>127.22,37.64,0</coordinates></Point>
     </Placemark>
     <Placemark>
       <name>하남교산 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 하남시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>127.1745,37.5305,0</coordinates></Point>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 하남시
+읍면동: 교산동 일원
+현재단계: 조성공사
+단계상세: A-2BL 공정률 0%(2025.11) 2026 착공 예정
+지연여부: Y(입주 2025→2027하 연기)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://www.molit.go.kr/policy/capital/cap_e_03.jsp
+최근확인일: 2026-07-05
+비고: GTX-D 연계 논의</description>
+      <Point><coordinates>127.19,37.52,0</coordinates></Point>
     </Placemark>
     <Placemark>
       <name>인천계양 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 인천 계양구
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.728,37.5895,0</coordinates></Point>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 인천
+시군구: 계양구
+읍면동: 동양동·박촌동 일원
+현재단계: 본청약
+단계상세: A2·A3블록 3기 신도시 최초 본청약 2026.12 입주 예정
+지연여부: Y(입주 2025→2026 연기)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://magazine.hankyung.com/money/article/202602237018c
+최근확인일: 2026-07-05
+비고: 3기 중 진행 최선두</description>
+      <Point><coordinates>126.73,37.57,0</coordinates></Point>
     </Placemark>
     <Placemark>
       <name>고양창릉 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 고양시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.867,37.639,0</coordinates></Point>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 고양시 덕양구
+읍면동: 창릉동·원흥동 일원
+현재단계: 착공(주택)
+단계상세: A-4BL 8.3% 등 공정률 한자릿수 2026.3·6 본청약
+지연여부: Y(입주 2025→2028상 연기)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://magazine.hankyung.com/money/article/202602237018c
+최근확인일: 2026-07-05
+비고: GTX-A 창릉역 2030 개통 예정</description>
+      <Point><coordinates>126.89,37.63,0</coordinates></Point>
     </Placemark>
     <Placemark>
       <name>부천대장 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 부천시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.769,37.576,0</coordinates></Point>
-    </Placemark>
-    <Placemark>
-      <name>안산장상 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 안산시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.846,37.339,0</coordinates></Point>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 부천시
+읍면동: 대장동·오정동 일원
+현재단계: 착공(주택)
+단계상세: 공정률 5%대(2025.11) SK하이닉스 입주 예정
+지연여부: Y(입주 2026→2027하 연기)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://www.mt.co.kr/estate/2025/11/28/2025112714140542442
+최근확인일: 2026-07-05
+비고: 대장~홍대선 착공</description>
+      <Point><coordinates>126.77,37.53,0</coordinates></Point>
     </Placemark>
     <Placemark>
       <name>광명시흥 공공주택지구</name>
-      <description>category: 3기신도시
-law_basis: PHZ
-region: 경기 광명시·시흥시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.834,37.438,0</coordinates></Point>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 광명시·시흥시
+읍면동: 광명동·과림동 일원
+현재단계: 지구계획승인
+단계상세: 토지보상 진행 단계 상세 확인 필요
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://namu.wiki/w/3기 신도시
+최근확인일: 2026-07-05
+비고: 6번째 3기 신도시</description>
+      <Point><coordinates>126.86,37.44,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>GTX-A 노선</name>
-      <description>category: GTX
-law_basis: TRN
-region: 수도권 광역
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅 - 대표좌표는 성남역 기준</description>
-      <Point><coordinates>127.131,37.456,0</coordinates></Point>
+      <name>의왕군포안산 공공주택지구</name>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 의왕시·군포시·안산시
+현재단계: 지구지정
+단계상세: 상세 확인 필요
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://namu.wiki/w/3기 신도시
+최근확인일: 2026-07-05
+비고: 2.4대책 추가분</description>
+      <Point><coordinates>126.9,37.32,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>GTX-B 노선</name>
-      <description>category: GTX
-law_basis: TRN
-region: 수도권 광역
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅 - 대표좌표는 용산역 기준</description>
-      <Point><coordinates>126.927,37.5205,0</coordinates></Point>
+      <name>화성진안 공공주택지구</name>
+      <description>사업유형: 신도시(공공주택지구)
+근거법: 공공주택특별법
+시도: 경기
+시군구: 화성시
+읍면동: 진안동 일원
+현재단계: 지구지정
+단계상세: 상세 확인 필요
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 해당없음(공공분양, 매매시장 아님)
+출처URL: https://namu.wiki/w/3기 신도시
+최근확인일: 2026-07-05
+비고: 2.4대책 추가분</description>
+      <Point><coordinates>126.99,37.22,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>GTX-C 노선</name>
-      <description>category: GTX
-law_basis: TRN
-region: 수도권 광역
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅 - 대표좌표는 삼성역 기준</description>
-      <Point><coordinates>127.049,37.5045,0</coordinates></Point>
+      <name>GTX-A (운정중앙~동탄)</name>
+      <description>사업유형: 광역교통
+근거법: 광역교통법
+시도: 경기·서울
+시군구: 파주~화성
+현재단계: 부분개통
+단계상세: 남측(수서~동탄) 2024.3 북측(운정중앙~서울역) 2024.12 개통 서울~수서 직결 2026 예정 삼성역 2027~28 창릉역 2030
+지연여부: Y(삼성역 공사 지연)
+예타상태: 통과
+대략가격대: 해당없음(인프라사업, 매물 아님)
+출처URL: https://www.news1.kr/realestate/general/6155273
+최근확인일: 2026-07-05
+비고: 대표좌표=삼성역</description>
+      <Point><coordinates>127.06,37.508,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>분당 1기 선도지구</name>
-      <description>category: 1기선도지구
-law_basis: OLD
-region: 경기 성남시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>127.1085,37.3595,0</coordinates></Point>
+      <name>GTX-B (인천대입구~마석)</name>
+      <description>사업유형: 광역교통
+근거법: 광역교통법
+시도: 인천·서울·경기
+시군구: 인천~남양주
+현재단계: 착공
+단계상세: 공정 진행 중
+지연여부: N
+예타상태: 통과
+대략가격대: 해당없음(인프라사업, 매물 아님)
+출처URL: https://www.news1.kr/realestate/general/6155273
+최근확인일: 2026-07-05
+비고: 대표좌표=서울역 인근</description>
+      <Point><coordinates>126.978,37.566,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>일산 1기 선도지구</name>
-      <description>category: 1기선도지구
-law_basis: OLD
-region: 경기 고양시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.769,37.6785,0</coordinates></Point>
+      <name>GTX-C (덕정~수원)</name>
+      <description>사업유형: 광역교통
+근거법: 광역교통법
+시도: 경기·서울
+시군구: 양주~수원
+현재단계: 착공
+단계상세: 2026.4.30 실착공(중재 후) 완공 2031 이후 전망 청량리 변전소 등 현안
+지연여부: Y(당초 2028→2031+ 지연)
+예타상태: 통과
+대략가격대: 해당없음(인프라사업, 매물 아님)
+출처URL: https://namu.wiki/w/수도권 광역급행철도 C선
+최근확인일: 2026-07-05
+비고: 대표좌표=청량리역</description>
+      <Point><coordinates>127.048,37.58,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>평촌 1기 선도지구</name>
-      <description>category: 1기선도지구
-law_basis: OLD
-region: 경기 안양시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.9515,37.3935,0</coordinates></Point>
+      <name>분당 선도지구(양지·샛별·시범·목련 등)</name>
+      <description>사업유형: 재건축(노후계획도시)
+근거법: 노후계획도시특별법
+시도: 경기
+시군구: 성남시 분당구
+현재단계: 특별정비계획입안
+단계상세: 4곳 입안제안서 제출(2025 말) 용적률 평균 360% 안팎
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 확인필요(조사 범위 밖)
+출처URL: https://www.housingherald.co.kr/news/articleView.html?idxno=60035
+최근확인일: 2026-07-05
+비고: 선도지구 1차</description>
+      <Point><coordinates>127.12,37.38,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>산본 1기 선도지구</name>
-      <description>category: 1기선도지구
-law_basis: OLD
-region: 경기 군포시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.935,37.36,0</coordinates></Point>
+      <name>일산 선도지구(백송·후곡·강촌·정발)</name>
+      <description>사업유형: 재건축(노후계획도시)
+근거법: 노후계획도시특별법
+시도: 경기
+시군구: 고양시 일산동구·서구
+현재단계: 특별정비계획입안
+단계상세: 구역지정 2026으로 이월 백송·후곡 자문 진행
+지연여부: Y(구역지정 이월)
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 확인필요(조사 범위 밖)
+출처URL: https://www.housingherald.co.kr/news/articleView.html?idxno=60035
+최근확인일: 2026-07-05</description>
+      <Point><coordinates>126.77,37.67,0</coordinates></Point>
     </Placemark>
     <Placemark>
-      <name>중동 1기 선도지구</name>
-      <description>category: 1기선도지구
-law_basis: OLD
-region: 경기 부천시
-stage_code: TBD
-stage_name: TBD
-stage_date: TBD
-last_updated: 2026-07-05
-note: 최초 세팅</description>
-      <Point><coordinates>126.766,37.489,0</coordinates></Point>
+      <name>평촌 선도지구(귀인·민백)</name>
+      <description>사업유형: 재건축(노후계획도시)
+근거법: 노후계획도시특별법
+시도: 경기
+시군구: 안양시 동안구
+현재단계: 특별정비계획입안
+단계상세: 2곳 입안제안서 제출 민백 용적률 330%선
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 확인필요(조사 범위 밖)
+출처URL: https://www.housingherald.co.kr/news/articleView.html?idxno=60035
+최근확인일: 2026-07-05</description>
+      <Point><coordinates>126.96,37.39,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>중동 선도지구(은하마을·반달마을A)</name>
+      <description>사업유형: 재건축(노후계획도시)
+근거법: 노후계획도시특별법
+시도: 경기
+시군구: 부천시 원미구
+읍면동: 중동
+현재단계: 특별정비구역지정
+단계상세: 은하마을 특별정비구역 지정·고시 완료(2026.6) 반달A는 LH 협약 후 연내 지정 추진
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 확인필요(조사 범위 밖)
+출처URL: https://www.etoday.co.kr/news/view/2593709
+최근확인일: 2026-07-05
+비고: 은하마을=4개 단지 통합</description>
+      <Point><coordinates>126.76,37.5,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산본 선도지구(9-2구역 등)</name>
+      <description>사업유형: 재건축(노후계획도시)
+근거법: 노후계획도시특별법
+시도: 경기
+시군구: 군포시
+읍면동: 산본동
+현재단계: 사업시행자지정
+단계상세: 9-2구역 1기 신도시 최초 특별정비구역 지정(2025.12)+LH 사업시행자 선정(2026.3)+사업시행약정 체결
+지연여부: N
+예타상태: 해당없음(공공주택특별법 지구지정, 예타 별도 절차)
+대략가격대: 확인필요(조사 범위 밖)
+출처URL: https://www.etoday.co.kr/news/view/2593709
+최근확인일: 2026-07-05
+비고: 1기 신도시 전체 선행 사례</description>
+      <Point><coordinates>126.93,37.36,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>현대3단지</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 370-399. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>한양아파트2단지</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 182. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>하하골마을(현지개량)</name>
+      <description>사업유형: 주거환경개선
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 준공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1천만원대~5천만원대(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 767-23 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>하정초동측(십정6) / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 397번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>청천대진아파트구역</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 청천2동
+현재단계: 사업시행인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 3억+(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 청천2동 236번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.693,37.515,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>청천4구역 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 청천동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 청천동 16-8번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.693,37.515,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>진흥·동남</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 38-26. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>일신동(현지개량)</name>
+      <description>사업유형: 주거환경개선
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 일신동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1천만원대~5천만원대(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 일신동 106-29. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7051,37.5205,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>십정초주변 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 355-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>십정5구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 460-22번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>십정4구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 166-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>십정3구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 432번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>신촌구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 283-66번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>삼산대보아파트구역</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 삼산동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 3억+(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 삼산동 191번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7331,37.5214,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡재원아파트구역</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡1동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 3억+(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡1동 180-329번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 87-903번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡7구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 사업시행인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1억~2억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 225-2번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡6구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 10번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡5구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 사업시행인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1억~2억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 370-58번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>산곡3구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 조합설립인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1억~2억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 180-190번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부흥초동측 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 156-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부평현대1단지</name>
+      <description>사업유형: 재건축(도시정비법)
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 산곡동
+현재단계: 조합설립인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 산곡동 307번지 9 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7033,37.5122,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부평4구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 665-2번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부평2구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평2동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평2동 760-700번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부광초교서측 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부개동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부개동 65-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7443,37.488,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부개5구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부개1동
+현재단계: 조합설립인가
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 1억~2억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부개1동 381-15번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7443,37.488,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>부개4구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부개동
+현재단계: 착공
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부개동 13-5번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7443,37.488,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>동암중서측 / 정비구역후보지(23년 1차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 십정동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 십정동 499-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.6942,37.4784,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>동수초북측 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 623-1번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>동소정사거리북동측 / 정비구역후보지(23년 2차)</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 부평동
+현재단계: 정비구역지정
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 부평동 614번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7241,37.4897,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>갈산동64-12</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 갈산동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 갈산동 64-12번지 일원. P332와 동일지번 중복등재 추정(원 시스템 표기 그대로 유지). 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7223,37.5157,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>갈산동 64-12번지 일원</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 갈산동
+현재단계: 추진위승인
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 5천만원대~1억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 갈산동 64-12번지 일원. P331과 동일지번 중복등재 추정(원 시스템 표기 그대로 유지). 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7223,37.5157,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>갈산1구역</name>
+      <description>사업유형: 재개발
+근거법: 도시정비법
+시도: 인천
+시군구: 부평구
+읍면동: 갈산동
+현재단계: 관리처분
+단계상세: 인천시 추정분담금 정보시스템(2026.7 기준) 조회 결과
+지연여부: N
+예타상태: 해당없음(도시정비법 조합사업, 예타 비대상)
+대략가격대: 2억~3억(추정)
+출처URL: https://renewal.incheon.go.kr/ires/program/0000-0011-0025/program/business/search.do
+최근확인일: 2026-07-18
+비고: 대표지번: 갈산동 112-39번지 일원. 좌표는 동단위 근사치. 가격대는 단계기반 추정치, 실제 시세 미검증</description>
+      <Point><coordinates>126.7223,37.5157,0</coordinates></Point>
     </Placemark>
   </Document>
 </kml>

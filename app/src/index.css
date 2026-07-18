@@ -1,0 +1,60 @@
+:root {
+  --text: #1f2328;
+  --text-h: #08060d;
+  --bg: #ffffff;
+  --border: #d8d8dc;
+  --border-faint: #ececee;
+  --table-head-bg: #f6f6f8;
+  --row-hover: rgba(37, 99, 235, 0.06);
+  --row-selected: rgba(37, 99, 235, 0.12);
+  --legend-bg: rgba(255, 255, 255, 0.92);
+  --legend-fg: #1f2328;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 15px/145% var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #d5d7db;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --border: #333540;
+    --border-faint: #24252d;
+    --table-head-bg: #1c1d24;
+    --row-hover: rgba(96, 150, 255, 0.08);
+    --row-selected: rgba(96, 150, 255, 0.16);
+    --legend-bg: rgba(22, 23, 29, 0.92);
+    --legend-fg: #d5d7db;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2 {
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--text-h);
+}

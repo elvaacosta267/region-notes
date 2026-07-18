@@ -1,0 +1,105 @@
+.plan-detail {
+  padding: 12px;
+  font-size: 13px;
+  overflow: auto;
+  height: 100%;
+}
+
+.plan-detail--empty {
+  opacity: 0.6;
+  font-size: 13px;
+  padding: 24px 12px;
+}
+
+.plan-detail__title {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.plan-detail__meta {
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.plan-detail__score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.plan-detail__grade {
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.plan-detail__horizon {
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.plan-detail__factors {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.plan-detail__factors td {
+  border-top: 1px solid var(--border-faint, #2a2a2a);
+  padding: 5px 4px;
+  vertical-align: top;
+}
+
+.plan-detail__factor-label {
+  white-space: nowrap;
+  font-weight: 600;
+  width: 130px;
+}
+
+.plan-detail__factor-value {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  width: 40px;
+}
+
+.plan-detail__factor-basis {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.plan-detail__fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 4px 8px;
+  margin: 0 0 12px;
+}
+
+.plan-detail__fields dt {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.plan-detail__fields dd {
+  margin: 0;
+}
+
+.plan-detail__links {
+  display: flex;
+  gap: 12px;
+}
+
+.plan-detail__links a {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.plan-detail__links a:hover {
+  text-decoration: underline;
+}
