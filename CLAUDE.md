@@ -84,17 +84,27 @@ db/plans.csv (hand-edited source of truth)
 ```
 
 ### Feasibility scoring: raw factors vs. weighted score are split across languages, on purpose
-`tools/feasibility.py` computes five factors per plan — `A_stage_progress`, `B_pretest`,
-`C_delay`, `D_infra`, `E_price_attractiveness` — each as a `{value, basis}` pair, and writes them
-into GeoJSON properties **unweighted**. The weighted sum (`score = 100 × Σ(factor × weight) /
-Σ(weights)`) is computed only in `app/src/lib/computeScore.ts`, using weights that live in
-`app/src/store/rankingStore.ts` (Zustand) and are adjustable live via `WeightPanel.tsx`. This
-means weight tuning never requires re-running the Python pipeline or touching committed data —
-don't reintroduce a Python-side weighted score.
+`tools/feasibility.py` computes six factors per plan — `A_stage_progress`, `B_pretest`,
+`C_delay`, `D_infra`, `E_price_attractiveness`, `F_upside_potential` — each as a `{value, basis}`
+pair, and writes them into GeoJSON properties **unweighted**. The weighted sum (`score = 100 ×
+Σ(factor × weight) / Σ(weights)`) is computed only in `app/src/lib/computeScore.ts`, using weights
+that live in `app/src/store/rankingStore.ts` (Zustand) and are adjustable live via
+`WeightPanel.tsx`. This means weight tuning never requires re-running the Python pipeline or
+touching committed data — don't reintroduce a Python-side weighted score.
 
 `D_infra` (infrastructure linkage) depends on other plans' A/B/C scores, so `feasibility.py`
-computes it in two passes: first A/B/C for every row, then D/E using that lookup
-(`compute_all()` in `tools/feasibility.py`).
+computes it in two passes: first A/B/C (and `F_upside_potential`, which only needs A) for every
+row, then D/E using that lookup (`compute_all()` in `tools/feasibility.py`).
+
+`F_upside_potential` is deliberately `1 - A_stage_progress`, not an independently-sourced factor.
+The design intent: A (진척률) measures certainty/risk, but a further-along project has already had
+most of its price appreciation priced in — certainty and remaining upside move in *opposite*
+directions, not the same one. Before F existed, the default weights let A dominate, so 착공/준공
+(construction-started/completed) projects swept the top of the ranking purely for being
+low-risk, even though they had the least room left to grow. Giving F equal default weight to A
+(`DEFAULT_WEIGHTS` in `lib/types.ts`) keeps both axes in the same single ranked table rather than
+splitting into separate "safe" and "growth" tables — don't let A silently regain dominance by
+raising its default weight without also raising F's.
 
 `E_price_attractiveness` is derived from the manually-entered `대략가격대` column (no real-
 transaction API integration) — see `db/schema.md`'s "대략가격대 작성 원칙" for the tier mapping

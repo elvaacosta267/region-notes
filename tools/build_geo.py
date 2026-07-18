@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 db/plans.csv 를 읽어 geo/plans.geojson 과 geo/plans.kml 을 재생성한다.
-tools/feasibility.py 의 실현가능성 raw factor(A~E)도 함께 GeoJSON properties에 병합한다.
+tools/feasibility.py 의 실현가능성 raw factor(A~F)도 함께 GeoJSON properties에 병합한다.
 
 사용법:
     python3 tools/build_geo.py

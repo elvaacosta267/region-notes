@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 build_geo.py 스모크 테스트. db/plans.csv 의 모든 행이 좌표 누락 없이
-GeoJSON으로 변환되는지, 실현가능성 raw factor(A~E)가 채워지는지 확인한다.
+GeoJSON으로 변환되는지, 실현가능성 raw factor(A~F)가 채워지는지 확인한다.
 
 사용법:
     python3 tools/test_build_geo.py
@@ -35,7 +35,10 @@ class BuildGeoSmokeTest(unittest.TestCase):
             self.assertTrue(color and color.startswith("#"), f"{feat['properties'].get('id')} 색상 누락: {color}")
 
     def test_every_feature_has_feasibility_factors(self):
-        required = ["A_stage_progress", "B_pretest", "C_delay", "D_infra", "E_price_attractiveness"]
+        required = [
+            "A_stage_progress", "B_pretest", "C_delay", "D_infra",
+            "E_price_attractiveness", "F_upside_potential",
+        ]
         for feat in self.geojson["features"]:
             props = feat["properties"]
             for key in required:
@@ -44,7 +47,10 @@ class BuildGeoSmokeTest(unittest.TestCase):
                 self.assertIsInstance(props[key], float, f"{props.get('id')} 의 {key} 값이 float 아님: {props[key]!r}")
 
     def test_feasibility_values_in_range(self):
-        required = ["A_stage_progress", "B_pretest", "C_delay", "D_infra", "E_price_attractiveness"]
+        required = [
+            "A_stage_progress", "B_pretest", "C_delay", "D_infra",
+            "E_price_attractiveness", "F_upside_potential",
+        ]
         for feat in self.geojson["features"]:
             props = feat["properties"]
             for key in required:

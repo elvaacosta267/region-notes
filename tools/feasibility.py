@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-db/plans.csv 각 행에 대해 실현가능성 판별 4요소(A~D) + 투자금 매력도(E)를
-개별 {value, basis} 쌍으로 산출한다. 가중치는 여기서 곱하지 않는다 —
+db/plans.csv 각 행에 대해 실현가능성 판별 4요소(A~D) + 투자금 매력도(E) +
+잔여 개발이익 여력(F)을 개별 {value, basis} 쌍으로 산출한다. 가중치는 여기서 곱하지 않는다 —
 가중치가 바뀌어도 이 원자료를 다시 만들 필요가 없도록, 가중합 계산은
 app/src/lib/computeScore.ts(프론트)가 담당한다.
 
@@ -87,6 +87,18 @@ def compute_price_attractiveness(대략가격대):
     return 0.5, f"대략가격대 값 인식 불가({s}) → 0.5 기본값"
 
 
+def compute_upside_potential(a_val):
+    # 사업단계가 진척될수록(A 상승) 이미 가격에 반영된 부분이 커져 잔여 상승여력은 줄어든다고
+    # 가정한다 — 확실성(A)과 잔여 개발이익(F)은 서로 반대 방향으로 움직이는 별개의 축이라
+    # 하나의 "실현가능성"이 아니라 둘 다 순위표에 독립적으로 반영한다.
+    value = round(1 - a_val, 3)
+    basis = (
+        f"사업단계 진척률(A)={a_val:.2f} → 잔여 개발이익 여력 = 1-A = {value:.2f} "
+        "(초기단계일수록 향후 가격 상승여력 크고, 착공·준공에 가까울수록 이미 가격에 반영돼 여력 작다고 가정)"
+    )
+    return value, basis
+
+
 def compute_infra(인프라연계id, abc_by_id):
     ids = [x.strip() for x in (인프라연계id or "").split(";") if x.strip()]
     if not ids:
@@ -105,7 +117,8 @@ def compute_infra(인프라연계id, abc_by_id):
 def compute_all(rows):
     """rows: db/plans.csv를 csv.DictReader로 읽은 dict 리스트.
     반환: {id: {"A_stage_progress": {...}, "B_pretest": {...}, "C_delay": {...},
-               "D_infra": {...}, "E_price_attractiveness": {...}}}
+               "D_infra": {...}, "E_price_attractiveness": {...},
+               "F_upside_potential": {...}}}
     """
     stage_sequences = load_stage_sequences()
 
@@ -119,11 +132,13 @@ def compute_all(rows):
         a_val, a_basis = compute_stage_progress(row.get("사업유형", ""), row.get("현재단계", ""), stage_sequences)
         b_val, b_basis = compute_pretest(row.get("예타상태", ""))
         c_val, c_basis = compute_delay(row.get("지연여부", ""))
+        f_val, f_basis = compute_upside_potential(a_val)
         abc_by_id[pid] = (a_val, b_val, c_val)
         partial[pid] = {
             "A_stage_progress": {"value": a_val, "basis": a_basis},
             "B_pretest": {"value": b_val, "basis": b_basis},
             "C_delay": {"value": c_val, "basis": c_basis},
+            "F_upside_potential": {"value": f_val, "basis": f_basis},
         }
 
     # 2차 패스: D, E 계산

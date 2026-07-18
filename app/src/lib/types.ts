@@ -34,6 +34,8 @@ export interface PlanProperties {
   D_infra_basis: string;
   E_price_attractiveness: number;
   E_price_attractiveness_basis: string;
+  F_upside_potential: number;
+  F_upside_potential_basis: string;
 }
 
 export interface PlanFeature {
@@ -56,6 +58,7 @@ export const FEASIBILITY_FACTOR_KEYS = [
   "C_delay",
   "D_infra",
   "E_price_attractiveness",
+  "F_upside_potential",
 ] as const;
 
 export type FeasibilityFactorKey = (typeof FEASIBILITY_FACTOR_KEYS)[number];
@@ -66,14 +69,20 @@ export interface FeasibilityWeights {
   C_delay: number;
   D_infra: number;
   E_price_attractiveness: number;
+  F_upside_potential: number;
 }
 
+// A(확실성)와 F(잔여 개발이익 여력)는 서로 반대 방향으로 움직이는 별개의 축이라 동일
+// 가중치를 준다 — "실현가능성"과 "상승여력"을 하나의 순위표 안에서 같이 반영하기 위함
+// (진척률이 높을수록 안전하지만 이미 가격에 반영돼 상승여력은 작다는 전제, F_upside_potential
+// 은 1 - A_stage_progress 로 계산됨, tools/feasibility.py 참고).
 export const DEFAULT_WEIGHTS: FeasibilityWeights = {
-  A_stage_progress: 0.3,
-  B_pretest: 0.25,
+  A_stage_progress: 0.2,
+  B_pretest: 0.2,
   C_delay: 0.15,
   D_infra: 0.1,
-  E_price_attractiveness: 0.2,
+  E_price_attractiveness: 0.15,
+  F_upside_potential: 0.2,
 };
 
 export type Grade = "상" | "중" | "하";
