@@ -13,7 +13,12 @@ function App() {
   const selectedId = useRankingStore((s) => s.selectedId);
 
   const features = useMemo(
-    () => (data?.features ?? []).filter((f) => f.properties.시군구 === "부평구"),
+    () =>
+      (data?.features ?? []).filter(
+        (f) =>
+          f.properties.시군구 === "부평구" &&
+          !f.properties.대략가격대.startsWith("해당없음")
+      ),
     [data]
   );
   const selectedFeature = useMemo(
