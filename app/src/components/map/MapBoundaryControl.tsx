@@ -20,8 +20,9 @@ export function MapBoundaryControl() {
     return (
       <div className="map-boundary-control">
         <p className="map-boundary-control__hint">
-          지도를 클릭해 경계를 도로 따라 순서대로 찍어주세요 ({draftPoints.length}개
-          점, 완료하려면 3개 이상 필요 — 점 개수 제한 없음)
+          지도를 클릭해 새 점을 추가하거나, 기존 점(●)을 드래그해 위치를
+          수정하세요 ({draftPoints.length}개 점, 완료하려면 3개 이상 필요 — 점
+          개수 제한 없음)
         </p>
         <div className="map-boundary-control__actions">
           <button onClick={undoLastPoint} disabled={draftPoints.length === 0}>
@@ -51,7 +52,7 @@ export function MapBoundaryControl() {
         <>
           <span>경계 있음 ({boundary.length}개 점)</span>
           <div className="map-boundary-control__actions">
-            <button onClick={() => startDrawing(selectedId)}>다시 그리기</button>
+            <button onClick={() => startDrawing(selectedId)}>경계 수정</button>
             <button onClick={() => clearBoundary(selectedId)}>삭제</button>
           </div>
         </>

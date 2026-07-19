@@ -35,6 +35,11 @@ declare global {
     setMap(map: KakaoMap | null): void;
   }
 
+  interface KakaoMarker {
+    setMap(map: KakaoMap | null): void;
+    getPosition(): KakaoLatLng;
+  }
+
   interface KakaoMouseEvent {
     latLng: KakaoLatLng;
   }
@@ -58,6 +63,10 @@ declare global {
         fillColor?: string;
         fillOpacity?: number;
       }) => KakaoPolygon;
+      Marker: new (options: {
+        position: KakaoLatLng;
+        draggable?: boolean;
+      }) => KakaoMarker;
       event: {
         addListener(
           target: unknown,
