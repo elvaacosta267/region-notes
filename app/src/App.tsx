@@ -54,6 +54,9 @@ function App() {
           </a>
           를 함께 활용하세요.
         </p>
+        <p className="app__context-note">
+          참고(점수 미반영): 인천광역시장 박찬대 (더불어민주당, 2026.6 취임)
+        </p>
       </header>
       <div className="app__body">
         <div className="app__left">
