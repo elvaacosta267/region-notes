@@ -46,15 +46,19 @@ def load_stage_sequences():
 
 
 def compute_stage_progress(사업유형, 현재단계, stage_sequences):
+    """반환값에 idx+1(1-based 현재 단계 순번)과 전체 단계 수도 같이 준다 — 순위표
+    앱이 "진척도" 열(단계 수만큼 타일을 그리고 현재 순번까지 채우는 방식)을 그릴 때
+    이 basis 문장을 다시 파싱하지 않고 바로 쓸 수 있게 하기 위함."""
     seq = stage_sequences.get(사업유형)
     if not seq:
-        return 0.5, f"사업유형 '{사업유형}'에 대한 단계 시퀀스 없음 → 0.5 기본값"
+        return 0.5, f"사업유형 '{사업유형}'에 대한 단계 시퀀스 없음 → 0.5 기본값", 1, 2
     if 현재단계 not in seq:
-        return 0.5, f"현재단계 '{현재단계}'가 '{사업유형}' 시퀀스에 없음 → 0.5 기본값"
+        return 0.5, f"현재단계 '{현재단계}'가 '{사업유형}' 시퀀스에 없음 → 0.5 기본값", 1, len(seq)
     idx = seq.index(현재단계)
     denom = len(seq) - 1
     value = idx / denom if denom > 0 else 1.0
-    return round(value, 3), f"현재단계={현재단계}, 전체 {len(seq)}단계 중 {idx + 1}번째 → {value:.2f}"
+    basis = f"현재단계={현재단계}, 전체 {len(seq)}단계 중 {idx + 1}번째 → {value:.2f}"
+    return round(value, 3), basis, idx + 1, len(seq)
 
 
 def compute_pretest(예타상태):
@@ -129,13 +133,17 @@ def compute_all(rows):
         pid = row.get("id", "").strip()
         if not pid:
             continue
-        a_val, a_basis = compute_stage_progress(row.get("사업유형", ""), row.get("현재단계", ""), stage_sequences)
+        a_val, a_basis, a_idx, a_total = compute_stage_progress(
+            row.get("사업유형", ""), row.get("현재단계", ""), stage_sequences
+        )
         b_val, b_basis = compute_pretest(row.get("예타상태", ""))
         c_val, c_basis = compute_delay(row.get("지연여부", ""))
         f_val, f_basis = compute_upside_potential(a_val)
         abc_by_id[pid] = (a_val, b_val, c_val)
         partial[pid] = {
             "A_stage_progress": {"value": a_val, "basis": a_basis},
+            "A_stage_index": a_idx,
+            "A_stage_total": a_total,
             "B_pretest": {"value": b_val, "basis": b_basis},
             "C_delay": {"value": c_val, "basis": c_basis},
             "F_upside_potential": {"value": f_val, "basis": f_basis},

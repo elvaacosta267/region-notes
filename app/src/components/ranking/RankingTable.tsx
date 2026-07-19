@@ -15,6 +15,34 @@ const GRADE_CLASS: Record<string, string> = {
   하: "grade--low",
 };
 
+// "예상완공시기"는 원문에 준공 예정일 자체가 없어 대부분 "확인필요"만 뜨는 컬럼이었다 —
+// 대신 사업유형별 전체 단계 수(A_stage_total) 만큼 타일을 그리고 현재 단계(A_stage_index)
+// 까지 채워서 "완공까지 얼마나 남았는지"가 아니라 "전체 절차 중 어디쯤인지"를 보여준다.
+function StageProgressTiles({
+  index,
+  total,
+  color,
+}: {
+  index: number;
+  total: number;
+  color: string;
+}) {
+  return (
+    <div className="ranking-table__stage-tiles" title={`${index}/${total}단계`}>
+      {Array.from({ length: total }, (_, i) => (
+        <span
+          key={i}
+          className="ranking-table__stage-tile"
+          style={{
+            borderColor: color,
+            background: i < index ? color : "transparent",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function RankingTable({ features }: { features: PlanFeature[] }) {
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
@@ -51,7 +79,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
             <th>등급</th>
             <th>기간</th>
             <th>대략가격대</th>
-            <th>예상완공시기</th>
+            <th>진척도</th>
             <th></th>
           </tr>
         </thead>
@@ -112,7 +140,9 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 </td>
                 <td>{sp.investmentHorizon}</td>
                 <td className="ranking-table__price">{p.대략가격대}</td>
-                <td className="ranking-table__completion">{p.예상완공시기}</td>
+                <td>
+                  <StageProgressTiles index={p.A_stage_index} total={p.A_stage_total} color={p.color} />
+                </td>
                 <td className="ranking-table__links">
                   <a
                     href={naverSearchUrl(name)}

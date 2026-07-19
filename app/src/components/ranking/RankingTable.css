@@ -32,11 +32,24 @@
 }
 
 /* 값 중 일부(예: "확인필요(...상세사유...)")가 유독 길어서 nowrap이면 그 한 행 때문에
-   열 전체가 늘어난다 — 이 두 열만 줄바꿈을 허용하고 폭을 제한해 막는다. */
-.ranking-table__price,
-.ranking-table__completion {
+   열 전체가 늘어난다 — 이 열만 줄바꿈을 허용하고 폭을 제한해 막는다. */
+.ranking-table__price {
   white-space: normal;
   max-width: 160px;
+}
+
+.ranking-table__stage-tiles {
+  display: flex;
+  gap: 2px;
+}
+
+.ranking-table__stage-tile {
+  width: 10px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .ranking-table tbody tr {

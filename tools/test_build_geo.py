@@ -69,6 +69,15 @@ class BuildGeoSmokeTest(unittest.TestCase):
             for key in ("최신업데이트일", "최신업데이트요약", "최신업데이트출처URL"):
                 self.assertIn(key, props, f"{props.get('id')} 에 {key} 없음")
 
+    def test_every_feature_has_stage_index_and_total(self):
+        for feat in self.geojson["features"]:
+            props = feat["properties"]
+            self.assertIn("A_stage_index", props, f"{props.get('id')} 에 A_stage_index 없음")
+            self.assertIn("A_stage_total", props, f"{props.get('id')} 에 A_stage_total 없음")
+            idx, total = props["A_stage_index"], props["A_stage_total"]
+            self.assertGreaterEqual(idx, 1, f"{props.get('id')} A_stage_index < 1: {idx}")
+            self.assertLessEqual(idx, total, f"{props.get('id')} A_stage_index > A_stage_total: {idx}/{total}")
+
 
 class UpdateLogParsingTest(unittest.TestCase):
     """updates/YYYY-MM-DD.md 파싱 로직(updates/README.md 템플릿 형식) 검증."""
