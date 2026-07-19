@@ -6,6 +6,7 @@ import { MapView } from "./components/map/MapView";
 import { Legend } from "./components/map/Legend";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
+import { BoundaryExport } from "./components/filters/BoundaryExport";
 import "./App.css";
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
+          <BoundaryExport />
           <RankingTable features={features} />
         </div>
         <div className="app__right">

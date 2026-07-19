@@ -33,6 +33,9 @@ export interface PlanProperties {
   세대수: string;
   건폐율: string;
   용적률: string;
+  // 착공일 + 공사기간 가정(30개월)으로 추정한 값 — 원문에 예상 준공일 자체가 없어
+  // 이 저장소가 직접 계산한 추정치다. 착공일 미확인 사업은 "확인필요(...)" 문자열.
+  예상완공시기: string;
 
   A_stage_progress: number;
   A_stage_progress_basis: string;

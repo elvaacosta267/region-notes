@@ -3,6 +3,10 @@
   height: 100%;
 }
 
+.map-view--drawing {
+  cursor: crosshair;
+}
+
 .map-view__marker {
   border-radius: 50%;
   border-style: solid;

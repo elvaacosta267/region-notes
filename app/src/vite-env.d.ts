@@ -31,6 +31,14 @@ declare global {
     setMap(map: KakaoMap | null): void;
   }
 
+  interface KakaoPolygon {
+    setMap(map: KakaoMap | null): void;
+  }
+
+  interface KakaoMouseEvent {
+    latLng: KakaoLatLng;
+  }
+
   const kakao: {
     maps: {
       load(callback: () => void): void;
@@ -42,8 +50,21 @@ declare global {
         yAnchor?: number;
         zIndex?: number;
       }) => KakaoCustomOverlay;
+      Polygon: new (options: {
+        path: KakaoLatLng[];
+        strokeWeight?: number;
+        strokeColor?: string;
+        strokeOpacity?: number;
+        fillColor?: string;
+        fillOpacity?: number;
+      }) => KakaoPolygon;
       event: {
-        addListener(target: unknown, type: string, handler: (...args: unknown[]) => void): void;
+        addListener(
+          target: unknown,
+          type: string,
+          handler: (e: KakaoMouseEvent) => void
+        ): void;
+        removeListener(target: unknown, type: string, handler: (e: KakaoMouseEvent) => void): void;
       };
     };
   };

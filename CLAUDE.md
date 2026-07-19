@@ -63,6 +63,14 @@ The source site emits `0`/`1` placeholders instead of blanks for undetermined fi
 early-stage (정비구역후보지 등) projects; `clean_stats()` filters the placeholder pattern out
 rather than storing it as if it were real data — don't remove that filter to "get more data".
 
+This script also parses the same page's "추진과정" (stage history) table for the actual 착공
+(construction-start) date, and computes `예상완공시기` as 착공일 + `CONSTRUCTION_MONTHS` (30, a
+documented assumption, not per-project data) — the source site has **no** projected completion
+date at all; unstarted-construction stages show `[0000-00-00] 시기 미도래` literally. Only plans
+with a real, non-placeholder 착공 date get a computed estimate; everything else gets an honest
+`"확인필요(...)"` string. Re-run this script whenever a plan's stage changes — "keeping this up to
+date" is not a background job, it's re-running the pipeline (see README's 업데이트 루프).
+
 ### React app (`app/`)
 ```bash
 cd app
@@ -180,26 +188,41 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   design, not a secret, but every domain that serves the app (`localhost:5173` for dev,
   `elvaacosta267.github.io` for prod) must be registered under the Kakao Developers app's
   "플랫폼 키" → Web platform settings or the SDK silently fails to authenticate.
-  Markers are still points, not parcel-shaped polygons (a real 아파트 단지 renders as a circle
-  floating over it, not an outline matching its actual footprint) — this was explicitly requested
-  and explicitly deferred, not overlooked. Kakao's Maps JS SDK doesn't expose 지적도(cadastral)
-  polygon geometry through a free key; doing this properly needs a separate polygon data source
-  (e.g. VWorld's 지적편집도 API, itself a separate free-signup key) plus rendering via
-  `kakao.maps.Polygon` instead of `CustomOverlay`. Don't approximate a polygon from the point +
-  a guessed radius — that would look precise while being fabricated.
+  Markers are still points, not automatically-fetched parcel-shaped polygons — Kakao's Maps JS
+  SDK doesn't expose 지적도(cadastral) polygon geometry through a free key; doing that properly
+  needs a separate polygon data source (e.g. VWorld's 지적편집도 API, itself a separate
+  free-signup key) plus rendering via `kakao.maps.Polygon`. Don't approximate a polygon from the
+  point + a guessed radius — that would look precise while being fabricated. Instead, users can
+  hand-draw an approximate boundary themselves (see next bullet) — that's an explicit, visible
+  "this is a manual sketch" input, not a fabricated automatic one.
+- `store/boundaryStore.ts` + the "구역 경계 그리기" controls in `PlanDetailPanel.tsx` let a user
+  click points on the map (`MapView.tsx`'s click-to-add-vertex mode, active only while
+  `drawingPlanId` is set) to trace a plan's boundary as a `kakao.maps.Polygon` overlay. Persisted
+  to `localStorage` only (`persist` middleware, `partialize`d to just `boundaries` — the
+  in-progress `drawingPlanId`/`draftPoints` are deliberately *not* persisted, or a page reload
+  would permanently strand the map in draw-mode). Since this is a static site with no backend,
+  a drawn boundary never leaves the browser it was drawn in; `components/filters/BoundaryExport.tsx`
+  serializes all boundaries to JSON (clipboard, with a `<textarea>` fallback for when
+  `navigator.clipboard` is blocked) so a user can hand that JSON to Claude in a future session to
+  commit permanently (e.g. into a new `geo/plan_boundaries.geojson`) — same pattern as the
+  README's 업데이트 루프, just for geometry instead of CSV rows.
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both
   `RankingTable` and `MapView`/`PlanDetailPanel` call it independently with the same weights from
   the store, rather than passing a pre-computed score down — keep it that way so re-weighting
   stays consistent everywhere.
-- `lib/hogangnonoLink.ts` and `lib/naverLandLink.ts` both generate `site:<domain>` Google-search
-  deep links rather than a guessed internal search URL — neither 호갱노노 nor 네이버부동산 has a
-  public API and both search UIs are SPA-routed (호갱노노's is also signup-gated), so this is the
-  only reliably-working link format. Both call the shared `lib/planSearchName.ts` first, which
-  strips plans.csv's internal classification suffixes (`" / 정비구역후보지(23년 2차)"`,
-  `"(현지개량)"`) from `사업명` — leaving them in the query returns zero Google results even for
-  plans that do have real listings.
+- `lib/naverSearchLink.ts` generates a plain `search.naver.com` query — this replaced an earlier
+  approach (`site:hogangnono.com` / `site:new.land.naver.com` Google searches) that turned out
+  unreliable in practice: Google barely indexes `new.land.naver.com` at all (near-empty results
+  even for common apartment names), and even where it did index something it would silently
+  fall back to unrelated pages sharing a keyword instead of saying "no results." Naver's own
+  search always returns HTTP 200 with either relevant results or an honest empty state, so it's
+  the more robust fallback even though it can't deep-link into either site specifically. Don't
+  reintroduce the site-restricted Google approach without solving that reliability gap. It still
+  calls `lib/planSearchName.ts` first, which strips plans.csv's internal classification suffixes
+  (`" / 정비구역후보지(23년 2차)"`, `"(현지개량)"`) from `사업명` — leaving them in the query
+  pollutes the search for plans that do have real listings.
 - `lib/types.ts` mirrors `geo/plans.geojson`'s `properties` shape field-for-field (Korean field
   names included). This exists specifically to catch schema drift between `db/plans.csv` and the
   frontend at compile time — a real bug (mismatched `lat`/`lon` vs `lat`/`lng` column names) once

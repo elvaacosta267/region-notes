@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
-import { hogangnonoSearchUrl } from "../../lib/hogangnonoLink";
-import { naverLandSearchUrl } from "../../lib/naverLandLink";
+import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { useRankingStore } from "../../store/rankingStore";
 import "./RankingTable.css";
 
@@ -36,6 +35,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
             <th>등급</th>
             <th>기간</th>
             <th>대략가격대</th>
+            <th>예상완공시기</th>
             <th></th>
           </tr>
         </thead>
@@ -65,24 +65,16 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 </td>
                 <td>{sp.investmentHorizon}</td>
                 <td>{p.대략가격대}</td>
+                <td className="ranking-table__completion">{p.예상완공시기}</td>
                 <td className="ranking-table__links">
                   <a
-                    href={hogangnonoSearchUrl(p.사업명)}
+                    href={naverSearchUrl(p.사업명)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="ranking-table__link"
                   >
-                    호갱노노 ↗
-                  </a>
-                  <a
-                    href={naverLandSearchUrl(p.사업명)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="ranking-table__link"
-                  >
-                    네이버부동산 ↗
+                    네이버 검색 ↗
                   </a>
                 </td>
               </tr>
