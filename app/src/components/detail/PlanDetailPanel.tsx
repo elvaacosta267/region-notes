@@ -1,6 +1,7 @@
 import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
+import { officialZoneLabel } from "../../lib/officialZoneLabel";
 import { useRankingStore } from "../../store/rankingStore";
 import "./PlanDetailPanel.css";
 
@@ -28,6 +29,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const score = computeScore(feature, weights);
   const grade = computeGrade(score);
   const horizon = computeInvestmentHorizon(feature);
+  const zoneLabel = officialZoneLabel(p.비고);
 
   return (
     <div className="plan-detail">
@@ -35,6 +37,14 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
       <div className="plan-detail__meta">
         {p.사업유형} · {p.시도} {p.시군구} {p.읍면동} · 현재단계: {p.현재단계}
       </div>
+      {zoneLabel && (
+        <div className="plan-detail__zone-label">
+          {zoneLabel}
+          <span className="plan-detail__zone-label-hint">
+            (지자체 지정 고시 관용 표기 — 같은 표기가 다른 사업에도 있으면 동일지번 중복등재 의심)
+          </span>
+        </div>
+      )}
       <div className="plan-detail__score">
         종합점수 {score.toFixed(1)} <span className="plan-detail__grade">{grade}</span>
         <span className="plan-detail__horizon">{horizon} 투자 후보</span>

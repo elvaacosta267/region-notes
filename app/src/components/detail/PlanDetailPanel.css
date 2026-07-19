@@ -21,6 +21,18 @@
   margin-bottom: 8px;
 }
 
+.plan-detail__zone-label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.plan-detail__zone-label-hint {
+  font-weight: 400;
+  opacity: 0.65;
+  margin-left: 6px;
+}
+
 .plan-detail__score {
   display: flex;
   align-items: center;
