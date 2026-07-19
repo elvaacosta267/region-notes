@@ -13,6 +13,7 @@ import "./MapView.css";
 const BUPYEONG_CENTER = { lat: 37.5, lng: 126.72 };
 const DEFAULT_LEVEL = 10; // 카카오맵 레벨: 숫자가 작을수록 확대. 정확한 위치보다 "대충 인천 어디쯤"이 목적이라 넓게 잡음
 const SELECTED_LEVEL = 3;
+const DRAWING_LEVEL = 1; // 경계를 도로 따라 한땀한땀 찍으려면 필지/도로가 구분되는 최대 확대가 필요
 
 function scoreToDiameter(score: number): number {
   // 0~100 점수를 12~32px 지름으로 매핑 (기존 Leaflet 반지름 6~16px과 동일한 비율)
@@ -25,6 +26,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const boundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
   const draftPolygonRef = useRef<KakaoPolygon | null>(null);
+  const drawStartedForRef = useRef<string | null>(null);
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
   const selectPlan = useRankingStore((s) => s.selectPlan);
@@ -150,6 +152,21 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       cancelled = true;
     };
   }, [drawingPlanId, draftPoints, colorById]);
+
+  // 그리기 시작 시점에만(다시 그리기 포함) 해당 사업 위치로 바짝 확대 —
+  // 도로/필지 경계를 보고 정밀하게 점을 찍을 수 있어야 함. 그리는 도중
+  // features가 갱신돼도 다시 확대/이동하면 사용자가 둘러본 화면이 튐.
+  useEffect(() => {
+    if (drawingPlanId && drawingPlanId !== drawStartedForRef.current && mapRef.current) {
+      const feature = features.find((f) => f.properties.id === drawingPlanId);
+      if (feature) {
+        const [lng, lat] = feature.geometry.coordinates;
+        mapRef.current.panTo(new kakao.maps.LatLng(lat, lng));
+        mapRef.current.setLevel(DRAWING_LEVEL);
+      }
+    }
+    drawStartedForRef.current = drawingPlanId;
+  }, [drawingPlanId, features]);
 
   // 그리기 모드일 때 지도 클릭 -> 점 추가
   useEffect(() => {

@@ -93,8 +93,9 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         {drawingPlanId === p.id ? (
           <>
             <p className="plan-detail__dev-stats-hint">
-              지도를 클릭해 구역 경계를 순서대로 찍어주세요 ({draftPoints.length}개 점,
-              완료하려면 3개 이상 필요). 지적도가 아니라 눈대중으로 그리는 참고용 경계입니다.
+              지도를 클릭해 구역 경계를 도로를 따라 순서대로 찍어주세요 ({draftPoints.length}개
+              점, 완료하려면 3개 이상 필요 — 점 개수 제한 없음, 필요한 만큼 계속 찍으세요).
+              지적도가 아니라 눈대중으로 그리는 참고용 경계입니다.
             </p>
             <div className="plan-detail__boundary-actions">
               <button onClick={undoLastPoint} disabled={draftPoints.length === 0}>
