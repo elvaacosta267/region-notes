@@ -265,6 +265,13 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   calls `lib/planSearchName.ts` first, which strips plans.csv's internal classification suffixes
   (`" / 정비구역후보지(23년 2차)"`, `"(현지개량)"`) from `사업명` — leaving them in the query
   pollutes the search for plans that do have real listings.
+- `lib/naverSearchLink.ts`'s `naverLandMapUrl()` opens 네이버부동산's map view centered on a
+  plan's coordinates (`ms=lat,lng,17`) rather than trying a name-based search — 네이버부동산 is a
+  SPA with no keyword-search deep link (same reason `naverSearchUrl` above doesn't try one), but
+  its map-center URL convention is real and independent of that limitation. Could not be
+  live-verified against `new.land.naver.com` in this repo's sandboxed dev environment (the
+  Browser tool's preview policy blocks that domain outright) — if a user reports the link landing
+  on an unexpected view, check the `a=`/`e=` property-type filter codes first.
 - `lib/types.ts` mirrors `geo/plans.geojson`'s `properties` shape field-for-field (Korean field
   names included). This exists specifically to catch schema drift between `db/plans.csv` and the
   frontend at compile time — a real bug (mismatched `lat`/`lon` vs `lat`/`lng` column names) once

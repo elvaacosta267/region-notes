@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
-import { naverSearchUrl } from "../../lib/naverSearchLink";
+import { naverSearchUrl, naverLandMapUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
 import { commitNameOverride, planDisplayName } from "../../lib/planDisplayName";
 import { isRecentUpdate } from "../../lib/recentUpdate";
@@ -233,6 +233,13 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         )}
         <a href={naverSearchUrl(name)} target="_blank" rel="noopener noreferrer">
           네이버에서 검색 ↗
+        </a>
+        <a
+          href={naverLandMapUrl(feature.geometry.coordinates[1], feature.geometry.coordinates[0])}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          네이버 매물지도 ↗
         </a>
       </div>
     </div>
