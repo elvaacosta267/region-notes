@@ -123,7 +123,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
           const isSelected = planId === selectedId;
           const polygon = new kakao.maps.Polygon({
             path: points.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
-            strokeWeight: isSelected ? 4 : 2,
+            strokeWeight: isSelected ? 2 : 1,
             strokeColor: color,
             strokeOpacity: 0.9,
             fillColor: color,
@@ -150,7 +150,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       const color = colorById.get(drawingPlanId) ?? "#2563eb";
       const polygon = new kakao.maps.Polygon({
         path: draftPoints.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
-        strokeWeight: 2,
+        strokeWeight: 1,
         strokeColor: color,
         strokeOpacity: 1,
         fillColor: color,
