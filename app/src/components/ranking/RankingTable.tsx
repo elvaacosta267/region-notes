@@ -4,6 +4,7 @@ import { rankPlans } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
 import { planDisplayName } from "../../lib/planDisplayName";
+import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
 import "./RankingTable.css";
@@ -61,6 +62,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
             const zoneLabel = officialZoneLabel(p.비고);
             const isDuplicateZone = zoneLabel ? (zoneLabelCounts.get(zoneLabel) ?? 0) > 1 : false;
             const name = planDisplayName(p.id, p.사업명, nameOverrides);
+            const hasRecentUpdate = isRecentUpdate(p.최신업데이트일);
             return (
               <tr
                 key={p.id}
@@ -72,6 +74,18 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                   <span className="ranking-table__name-row">
                     <span className="ranking-table__dot" style={{ background: p.color }} />
                     {name}
+                    {hasRecentUpdate && (
+                      <a
+                        className="ranking-table__update-badge"
+                        href={p.최신업데이트출처URL || undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        title={`${p.최신업데이트일} 업데이트: ${p.최신업데이트요약}`}
+                      >
+                        🆕 업데이트
+                      </a>
+                    )}
                   </span>
                   {zoneLabel && (
                     <div

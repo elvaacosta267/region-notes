@@ -37,6 +37,13 @@ export interface PlanProperties {
   // 이 저장소가 직접 계산한 추정치다. 착공일 미확인 사업은 "확인필요(...)" 문자열.
   예상완공시기: string;
 
+  // updates/YYYY-MM-DD.md(업데이트 루프 로그, 수동 또는 예약 에이전트가 작성)를
+  // build_geo.py가 파싱해서 채우는 필드 — 값이 있으면 실제 뉴스/고시 기반 변경이 있었다는
+  // 뜻이고, 없으면(빈 문자열) 아직 이 사업에 대한 로그 항목이 없다는 뜻이다.
+  최신업데이트일: string;
+  최신업데이트요약: string;
+  최신업데이트출처URL: string;
+
   A_stage_progress: number;
   A_stage_progress_basis: string;
   B_pretest: number;

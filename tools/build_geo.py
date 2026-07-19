@@ -11,6 +11,7 @@ tools/feasibility.py 의 실현가능성 raw factor(A~F)도 함께 GeoJSON prope
 import csv
 import json
 import os
+import re
 import sys
 from xml.sax.saxutils import escape
 
@@ -21,6 +22,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV_PATH = os.path.join(ROOT, "db", "plans.csv")
 GEOJSON_PATH = os.path.join(ROOT, "geo", "plans.geojson")
 KML_PATH = os.path.join(ROOT, "geo", "plans.kml")
+UPDATES_DIR = os.path.join(ROOT, "updates")
+
+# updates/YYYY-MM-DD.md 안의 "- [id: P306] 요약" + 바로 아래 "  - 출처: URL" 줄을 파싱한다
+# (형식은 updates/README.md 템플릿과 반드시 일치해야 함).
+UPDATE_FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
+UPDATE_ID_BULLET_RE = re.compile(r"^-\s*\[id:\s*([^\]]+)\]\s*(.+)$")
+UPDATE_SOURCE_RE = re.compile(r"^\s*-\s*출처:\s*(\S+)")
 
 # 사업유형별 색상 (지도/KML 스타일용) — db/schema.md 의 사업유형 값과 1:1 대응
 CATEGORY_COLOR = {
@@ -45,8 +53,38 @@ def load_rows():
     return rows
 
 
+def load_update_log(updates_dir=UPDATES_DIR):
+    """updates/YYYY-MM-DD.md 파일들을 파싱해 plan id별 가장 최근 업데이트 항목을 만든다.
+    파일명 날짜 오름차순으로 훑으면서 같은 id가 다시 나오면 더 최신 파일 쪽으로 덮어쓴다."""
+    latest = {}
+    if not os.path.isdir(updates_dir):
+        return latest
+    filenames = sorted(f for f in os.listdir(updates_dir) if UPDATE_FILENAME_RE.match(f))
+    for filename in filenames:
+        date = UPDATE_FILENAME_RE.match(filename).group(1)
+        with open(os.path.join(updates_dir, filename), encoding="utf-8") as f:
+            lines = f.readlines()
+        pending = None  # (id, summary), 출처 줄을 기다리는 중
+        for line in lines:
+            id_match = UPDATE_ID_BULLET_RE.match(line.strip())
+            if id_match:
+                pending = (id_match.group(1).strip(), id_match.group(2).strip())
+                continue
+            source_match = UPDATE_SOURCE_RE.match(line)
+            if source_match and pending:
+                pid, summary = pending
+                latest[pid] = {
+                    "date": date,
+                    "summary": summary,
+                    "source_url": source_match.group(1),
+                }
+                pending = None
+    return latest
+
+
 def to_geojson(rows):
     scores = compute_all(rows)
+    update_log = load_update_log()
     features = []
     skipped = 0
     for row in rows:
@@ -67,6 +105,11 @@ def to_geojson(rows):
         for key, factor in factors.items():
             props[key] = factor["value"]
             props[f"{key}_basis"] = factor["basis"]
+
+        update = update_log.get(pid, {})
+        props["최신업데이트일"] = update.get("date", "")
+        props["최신업데이트요약"] = update.get("summary", "")
+        props["최신업데이트출처URL"] = update.get("source_url", "")
 
         features.append({
             "type": "Feature",
