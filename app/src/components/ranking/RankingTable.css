@@ -31,6 +31,14 @@
   white-space: nowrap;
 }
 
+/* 값 중 일부(예: "확인필요(...상세사유...)")가 유독 길어서 nowrap이면 그 한 행 때문에
+   열 전체가 늘어난다 — 이 두 열만 줄바꿈을 허용하고 폭을 제한해 막는다. */
+.ranking-table__price,
+.ranking-table__completion {
+  white-space: normal;
+  max-width: 160px;
+}
+
 .ranking-table tbody tr {
   cursor: pointer;
 }

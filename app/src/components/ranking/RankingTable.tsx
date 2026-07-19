@@ -111,7 +111,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                   </span>
                 </td>
                 <td>{sp.investmentHorizon}</td>
-                <td>{p.대략가격대}</td>
+                <td className="ranking-table__price">{p.대략가격대}</td>
                 <td className="ranking-table__completion">{p.예상완공시기}</td>
                 <td className="ranking-table__links">
                   <a
