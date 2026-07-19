@@ -45,9 +45,15 @@
 
 .ranking-table__name {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.ranking-table__name-row {
+  display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
 }
 
 .ranking-table__dot {
@@ -56,6 +62,19 @@
   height: 9px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.ranking-table__zone-label {
+  font-weight: 400;
+  font-size: 11px;
+  opacity: 0.6;
+  margin-left: 15px;
+}
+
+.ranking-table__zone-label--duplicate {
+  opacity: 1;
+  color: var(--warning, #d97706);
+  font-weight: 600;
 }
 
 .ranking-table__score {

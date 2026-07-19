@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
+import { officialZoneLabel } from "../../lib/officialZoneLabel";
 import { useRankingStore } from "../../store/rankingStore";
 import "./RankingTable.css";
 
@@ -17,6 +18,17 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
   const selectPlan = useRankingStore((s) => s.selectPlan);
 
   const ranked = useMemo(() => rankPlans(features, weights), [features, weights]);
+
+  // 같은 지정표기(대표지번 기반)를 쓰는 사업이 2건 이상이면 동일지번 중복등재
+  // 후보로 보고 표시한다 — 예: 갈산동64-12 / 갈산동 64-12번지 일원.
+  const zoneLabelCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    ranked.forEach((sp) => {
+      const label = officialZoneLabel(sp.feature.properties.비고);
+      if (label) counts.set(label, (counts.get(label) ?? 0) + 1);
+    });
+    return counts;
+  }, [ranked]);
 
   return (
     <div className="ranking-table__wrap">
@@ -43,6 +55,8 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
           {ranked.map((sp, i) => {
             const p = sp.feature.properties;
             const isSelected = p.id === selectedId;
+            const zoneLabel = officialZoneLabel(p.비고);
+            const isDuplicateZone = zoneLabel ? (zoneLabelCounts.get(zoneLabel) ?? 0) > 1 : false;
             return (
               <tr
                 key={p.id}
@@ -51,8 +65,23 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
               >
                 <td>{i + 1}</td>
                 <td className="ranking-table__name">
-                  <span className="ranking-table__dot" style={{ background: p.color }} />
-                  {p.사업명}
+                  <span className="ranking-table__name-row">
+                    <span className="ranking-table__dot" style={{ background: p.color }} />
+                    {p.사업명}
+                  </span>
+                  {zoneLabel && (
+                    <div
+                      className={
+                        isDuplicateZone
+                          ? "ranking-table__zone-label ranking-table__zone-label--duplicate"
+                          : "ranking-table__zone-label"
+                      }
+                      title={isDuplicateZone ? "다른 사업과 지정표기가 동일 — 동일지번 중복등재 의심" : undefined}
+                    >
+                      {zoneLabel}
+                      {isDuplicateZone && " ⚠️"}
+                    </div>
+                  )}
                 </td>
                 <td>{p.읍면동 || p.시군구}</td>
                 <td>{p.사업유형}</td>
