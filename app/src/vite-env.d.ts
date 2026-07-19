@@ -26,6 +26,7 @@ declare global {
     setLevel(level: number, options?: { anchor?: KakaoLatLng }): void;
     getLevel(): number;
     setBounds(bounds: KakaoLatLngBounds): void;
+    relayout(): void;
   }
 
   interface KakaoLatLngBounds {

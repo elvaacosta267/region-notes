@@ -14,6 +14,51 @@
 .plan-detail__title {
   margin: 0 0 4px;
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plan-detail__title-edit {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.55;
+  padding: 0;
+  line-height: 1;
+}
+
+.plan-detail__title-edit:hover {
+  opacity: 1;
+}
+
+.plan-detail__title-input {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  flex: 1;
+  padding: 2px 4px;
+  border: 1px solid var(--border, #333);
+  border-radius: 4px;
+  background: var(--bg, transparent);
+  color: inherit;
+}
+
+.plan-detail__name-original {
+  font-size: 11px;
+  opacity: 0.6;
+  margin: -2px 0 8px;
+}
+
+.plan-detail__name-reset {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  text-decoration: underline;
 }
 
 .plan-detail__meta {

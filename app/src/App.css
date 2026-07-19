@@ -35,6 +35,12 @@
   color: #2563eb;
 }
 
+.app__context-note {
+  font-size: 11px;
+  opacity: 0.55;
+  margin: 2px 0 0;
+}
+
 .app__body {
   flex: 1;
   display: flex;
@@ -68,12 +74,44 @@
   overflow: hidden;
 }
 
+.app__map-expand-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1000;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--legend-fg, #eee);
+  background: var(--legend-bg, rgba(20, 20, 20, 0.9));
+  color: var(--legend-fg, #eee);
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
 .app__detail {
   flex: 1;
   min-height: 160px;
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: auto;
+}
+
+.app--map-expanded .app__left {
+  flex: 0.7;
+}
+
+.app--map-expanded .app__right {
+  flex: 3;
+}
+
+.app--map-expanded .app__map {
+  flex: 3;
+}
+
+.app--map-expanded .app__detail {
+  flex: 0.7;
+  min-height: 120px;
 }
 
 @media (max-width: 900px) {

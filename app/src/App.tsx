@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { usePlansData } from "./hooks/usePlansData";
 import { useRankingStore } from "./store/rankingStore";
 import { RankingTable } from "./components/ranking/RankingTable";
@@ -12,6 +12,7 @@ import "./App.css";
 function App() {
   const { data, isLoading, error } = usePlansData();
   const selectedId = useRankingStore((s) => s.selectedId);
+  const [mapExpanded, setMapExpanded] = useState(false);
 
   const features = useMemo(
     () =>
@@ -41,7 +42,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${mapExpanded ? "app--map-expanded" : ""}`}>
       <header className="app__header">
         <h1>인천 부평구 정비사업 투자매력도 순위표</h1>
         <p className="app__subtitle">
@@ -52,6 +53,9 @@ function App() {
             호갱노노
           </a>
           를 함께 활용하세요.
+        </p>
+        <p className="app__context-note">
+          참고(점수 미반영): 인천광역시장 박찬대 (더불어민주당, 2026.6 취임)
         </p>
       </header>
       <div className="app__body">
@@ -64,6 +68,13 @@ function App() {
           <div className="app__map">
             <MapView features={features} />
             <MapBoundaryControl />
+            <button
+              type="button"
+              className="app__map-expand-toggle"
+              onClick={() => setMapExpanded((v) => !v)}
+            >
+              {mapExpanded ? "지도 원래 크기로 ⤡" : "지도 크게 보기 ⤢"}
+            </button>
           </div>
           <div className="app__detail">
             <PlanDetailPanel feature={selectedFeature} />
