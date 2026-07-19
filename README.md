@@ -47,6 +47,12 @@ npm run dev        # geo/plans.geojson 자동 동기화 후 개발 서버 실행
 5. (선택) Google My Maps 사용 시: mymaps.google.com → 새 지도 → 가져오기 → `geo/plans.kml` 업로드
 
 ## 업데이트 루프 (주기적)
+수동(대화) 또는 예약된 자동 검색, 두 경로 모두 같은 산출물을 만든다: `plans.csv` 변경분
++ `updates/YYYY-MM-DD.md` 로그(`updates/README.md` 템플릿 형식, `- [id: ...]` + `출처:`
+필수). `build_geo.py`가 이 로그를 파싱해 각 사업의 "최근 업데이트" 배지(순위표 앱에 표시,
+🆕 아이콘, 클릭 시 출처로 이동)를 채운다.
+
+**수동:**
 1. Claude와 대화 시작 → `db/plans.csv` 업로드 후 "최신 진행상황 반영해줘" 요청
 2. Claude가 뉴스·고시 검색 → 갱신된 `plans.csv` + `updates/YYYY-MM-DD.md` 생성
 3. 받은 `plans.csv` 로 교체 후 아래 실행 (geojson/kml 재생성 + 스모크 테스트)
@@ -60,6 +66,11 @@ npm run dev        # geo/plans.geojson 자동 동기화 후 개발 서버 실행
    git commit -m "update: 산본9-2 사업시행인가 (2026-08)"
    git push
    ```
+
+**자동(예약 작업):** 부동산 뉴스·구청/시청 고시를 주기적으로 검색해 위와 같은 변경분을
+찾으면 **PR을 초안으로 열고 자동 병합하지 않는다** — 사업명 오매칭·오래된 기사 재인용 같은
+오탐지 위험이 있어 사람이 리뷰 후 머지해야 한다. 예약 작업 설정/변경은 `schedule` 스킬로
+관리한다.
 
 > 커밋 이력 = 사업별 진행 타임라인.
 > 특정 사업의 변천사는 `git log -p db/plans.csv` 또는 GitHub 웹의 History/Blame 탭에서 확인.
@@ -75,6 +86,8 @@ npm run dev        # geo/plans.geojson 자동 동기화 후 개발 서버 실행
   다시 만들 필요가 없다.
 - `대략가격대`는 수작업 추정치이며 실제 시세가 아니다. 투자 판단 전 반드시 호갱노노 등에서
   재확인해야 한다.
+- `updates/*.md`에 없는 변경은 순위표 앱에 "최근 업데이트" 배지로 표시되지 않는다 — 배지는
+  이 로그 파일을 파싱해서 채워지므로, `plans.csv`만 고치고 로그를 안 남기면 배지가 안 뜬다.
 
 ## 로드맵
 - [x] 1단계: 역대 국토종합계획·수도권정비계획 연혁 정리 (`docs/01`)

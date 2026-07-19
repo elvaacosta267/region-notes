@@ -11,10 +11,11 @@ GeoJSON으로 변환되는지, 실현가능성 raw factor(A~F)가 채워지는�
 import csv
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_geo import CSV_PATH, to_geojson  # noqa: E402
+from build_geo import CSV_PATH, load_update_log, to_geojson  # noqa: E402
 
 
 class BuildGeoSmokeTest(unittest.TestCase):
@@ -61,6 +62,41 @@ class BuildGeoSmokeTest(unittest.TestCase):
     def test_bupyeong_sample_present(self):
         feature_ids = {f["properties"]["id"] for f in self.geojson["features"]}
         self.assertIn("P333", feature_ids, "부평구 갈산1구역(P333)이 GeoJSON에 없음")
+
+    def test_every_feature_has_update_fields(self):
+        for feat in self.geojson["features"]:
+            props = feat["properties"]
+            for key in ("최신업데이트일", "최신업데이트요약", "최신업데이트출처URL"):
+                self.assertIn(key, props, f"{props.get('id')} 에 {key} 없음")
+
+
+class UpdateLogParsingTest(unittest.TestCase):
+    """updates/YYYY-MM-DD.md 파싱 로직(updates/README.md 템플릿 형식) 검증."""
+
+    def test_parses_latest_entry_per_id_across_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "2026-07-01.md"), "w", encoding="utf-8") as f:
+                f.write(
+                    "# 2026-07-01 업데이트\n\n"
+                    "## 변경 사항\n"
+                    "- [id: P306] 청천4구역 — 추진위승인\n"
+                    "  - 출처: https://example.go.kr/notice/1\n"
+                )
+            with open(os.path.join(tmp, "2026-07-15.md"), "w", encoding="utf-8") as f:
+                f.write(
+                    "# 2026-07-15 업데이트\n\n"
+                    "## 변경 사항\n"
+                    "- [id: P306] 청천4구역 — 조합설립인가 취득\n"
+                    "  - 출처: https://example.go.kr/notice/2\n"
+                )
+            result = load_update_log(updates_dir=tmp)
+            self.assertEqual(result["P306"]["date"], "2026-07-15")
+            self.assertEqual(result["P306"]["source_url"], "https://example.go.kr/notice/2")
+            self.assertIn("조합설립인가", result["P306"]["summary"])
+
+    def test_missing_updates_dir_returns_empty(self):
+        result = load_update_log(updates_dir="/nonexistent/path/xyz")
+        self.assertEqual(result, {})
 
 
 if __name__ == "__main__":

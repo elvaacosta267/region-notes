@@ -4,6 +4,7 @@ import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
 import { planDisplayName } from "../../lib/planDisplayName";
+import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
 import "./PlanDetailPanel.css";
@@ -109,6 +110,21 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           <span className="plan-detail__zone-label-hint">
             (지자체 지정 고시 관용 표기 — 같은 표기가 다른 사업에도 있으면 동일지번 중복등재 의심)
           </span>
+        </div>
+      )}
+      {p.최신업데이트일 && (
+        <div className="plan-detail__update-note">
+          {isRecentUpdate(p.최신업데이트일) && (
+            <span className="plan-detail__update-badge">🆕 업데이트</span>
+          )}
+          <span className="plan-detail__update-text">
+            [{p.최신업데이트일}] {p.최신업데이트요약}
+          </span>
+          {p.최신업데이트출처URL && (
+            <a href={p.최신업데이트출처URL} target="_blank" rel="noopener noreferrer">
+              출처 ↗
+            </a>
+          )}
         </div>
       )}
       <div className="plan-detail__score">
