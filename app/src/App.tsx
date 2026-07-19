@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { usePlansData } from "./hooks/usePlansData";
+import { useBupyeongBoundary } from "./hooks/useBupyeongBoundary";
 import { useRankingStore } from "./store/rankingStore";
 import { RankingTable } from "./components/ranking/RankingTable";
 import { MapView } from "./components/map/MapView";
@@ -11,6 +12,7 @@ import "./App.css";
 
 function App() {
   const { data, isLoading, error } = usePlansData();
+  const { data: adminBoundary } = useBupyeongBoundary();
   const selectedId = useRankingStore((s) => s.selectedId);
   const [mapExpanded, setMapExpanded] = useState(false);
 
@@ -66,7 +68,7 @@ function App() {
         </div>
         <div className="app__right">
           <div className="app__map">
-            <MapView features={features} />
+            <MapView features={features} adminBoundary={adminBoundary} />
             <MapBoundaryControl />
             <button
               type="button"

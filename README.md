@@ -14,7 +14,8 @@ docs/      계획 요약·정리 문서 (md) — 국토종합계획·수도권�
 db/        진행현황 DB — plans.csv 가 단일 소스, schema.md 에 컬럼 정의,
            stage_sequences.json 에 사업유형별 단계 시퀀스(진척률 계산용)
 sources/   links_db.csv — 원문 출처 링크 트래킹(수집 대상 문서 목록, plans.csv와 별개)
-geo/       plans.geojson (지도용, 실현가능성 raw factor 포함), plans.kml
+geo/       plans.geojson (지도용, 실현가능성 raw factor 포함), plans.kml,
+           bupyeong_boundary.geojson (부평구 실제 행정동 경계, 지도 초기 화면/배경용)
 tools/     build_geo.py(csv→geojson/kml 재생성), feasibility.py(A~E 스코어링),
            test_build_geo.py(스모크 테스트)
 app/       React(Vite+TS) 순위표 앱 — 실제 사용자 화면. `npm run dev`로 실행
