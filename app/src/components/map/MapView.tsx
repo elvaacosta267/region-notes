@@ -39,6 +39,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const draftPolygonRef = useRef<KakaoPolygon | null>(null);
   const draftVertexMarkersRef = useRef<KakaoMarker[]>([]);
   const drawStartedForRef = useRef<string | null>(null);
+  const hasFitInitialBoundsRef = useRef(false);
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
   const selectPlan = useRankingStore((s) => s.selectPlan);
@@ -83,6 +84,28 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       cancelled = true;
     };
   }, []);
+
+  // 처음 화면을 열었을 때(아직 아무 사업도 선택 안 함)는 고정된 대략적 중심좌표 대신
+  // 부평구 전체 사업 좌표가 한 화면에 다 들어오도록 맞춘다 — 개별 마커는 작게 보여도
+  // "전체 개발현황을 한눈에" 보는 게 우선. 한 번 맞추고 나면(사용자가 뭔가 선택하면
+  // 아래 "선택된 사업으로 이동" 효과가 대신 담당) 다시 전체로 되돌리지 않는다.
+  useEffect(() => {
+    if (hasFitInitialBoundsRef.current || features.length === 0) return;
+    let cancelled = false;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current || hasFitInitialBoundsRef.current) return;
+      const bounds = new kakao.maps.LatLngBounds();
+      features.forEach((f) => {
+        const [lng, lat] = f.geometry.coordinates;
+        bounds.extend(new kakao.maps.LatLng(lat, lng));
+      });
+      mapRef.current.setBounds(bounds);
+      hasFitInitialBoundsRef.current = true;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [features]);
 
   // "지도 크게 보기" 토글 등으로 컨테이너 크기가 CSS로만 바뀌면 카카오맵은 이를
   // 자동 감지하지 못해 기존 캔버스 크기로 굳어버린다(빈 공간이 생김) — ResizeObserver로
