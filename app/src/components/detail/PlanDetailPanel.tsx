@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { naverSearchUrl, naverLandMapUrl } from "../../lib/naverSearchLink";
@@ -54,6 +54,15 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const horizon = computeInvestmentHorizon(feature);
   const zoneLabel = officialZoneLabel(p.비고);
   const name = planDisplayName(p.id, p.사업명, nameOverrides);
+
+  // 추진위/조합, 인근부동산, 초기투자프리미엄, 인근시세비교 — 스코어링 미반영 참고정보.
+  // 아직 리서치 전인 사업은 빈 문자열이라 필드 단위로 걸러서 채워진 것만 노출한다.
+  const researchFields = [
+    { label: "추진위/조합", value: p.추진위조합정보 },
+    { label: "인근 부동산", value: p.인근부동산 },
+    { label: "초기투자금/프리미엄", value: p.초기투자프리미엄정보 },
+    { label: "인근 시세비교", value: p.인근시세비교 },
+  ].filter((f) => f.value);
 
   const commitName = () => {
     commitNameOverride(p.id, p.사업명, nameDraft, setNameOverride, clearNameOverride);
@@ -192,6 +201,23 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         <dt>비고</dt>
         <dd>{p.비고}</dd>
       </dl>
+
+      {researchFields.length > 0 && (
+        <div className="plan-detail__research">
+          <p className="plan-detail__dev-stats-hint">
+            현장 리서치 정보 — 스코어링에는 반영되지 않는 수작업 참고정보입니다. 투자 판단 전
+            반드시 최신 정보로 재확인하세요.
+          </p>
+          <dl className="plan-detail__fields">
+            {researchFields.map((f) => (
+              <Fragment key={f.label}>
+                <dt>{f.label}</dt>
+                <dd>{f.value}</dd>
+              </Fragment>
+            ))}
+          </dl>
+        </div>
+      )}
 
       <div className="plan-detail__user-notes">
         <label className="plan-detail__user-notes-label" htmlFor="plan-detail-memo">
