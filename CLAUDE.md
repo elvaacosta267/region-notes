@@ -195,17 +195,28 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   point + a guessed radius — that would look precise while being fabricated. Instead, users can
   hand-draw an approximate boundary themselves (see next bullet) — that's an explicit, visible
   "this is a manual sketch" input, not a fabricated automatic one.
-- `store/boundaryStore.ts` + the "구역 경계 그리기" controls in `PlanDetailPanel.tsx` let a user
-  click points on the map (`MapView.tsx`'s click-to-add-vertex mode, active only while
-  `drawingPlanId` is set) to trace a plan's boundary as a `kakao.maps.Polygon` overlay. Persisted
-  to `localStorage` only (`persist` middleware, `partialize`d to just `boundaries` — the
-  in-progress `drawingPlanId`/`draftPoints` are deliberately *not* persisted, or a page reload
-  would permanently strand the map in draw-mode). Since this is a static site with no backend,
-  a drawn boundary never leaves the browser it was drawn in; `components/filters/BoundaryExport.tsx`
-  serializes all boundaries to JSON (clipboard, with a `<textarea>` fallback for when
-  `navigator.clipboard` is blocked) so a user can hand that JSON to Claude in a future session to
-  commit permanently (e.g. into a new `geo/plan_boundaries.geojson`) — same pattern as the
-  README's 업데이트 루프, just for geometry instead of CSV rows.
+- `store/boundaryStore.ts` + `components/map/MapBoundaryControl.tsx` (rendered over the map,
+  bottom-left — replaced the old category legend there since re-weighting already shows category
+  via marker color, and this spot is far more useful for a control the user reaches for
+  constantly) let a user click points on the map (`MapView.tsx`'s click-to-add-vertex mode, active
+  only while `drawingPlanId` is set) to trace a plan's boundary as a `kakao.maps.Polygon` overlay,
+  keyed off the currently-selected plan (`rankingStore`'s `selectedId`) rather than needing the
+  detail panel open. Each point in `draftPoints` also gets a draggable `kakao.maps.Marker` so a
+  single mis-placed point can be dragged to the right spot (`updateDraftPoint(index, point)`)
+  without redrawing the whole polygon — "다시 그리기" only re-enters this same edit mode loaded
+  with the existing points, it doesn't discard them. Once a plan has a saved boundary, its round
+  `CustomOverlay` marker is hidden (filtered out in the marker-rendering effect) so the polygon
+  isn't doubled up with a dot on top of it — the polygon itself is click-to-select
+  (`kakao.maps.event.addListener(polygon, "click", ...)`) and gets a thicker stroke when selected,
+  taking over the marker's job. Persisted to `localStorage` only (`persist` middleware,
+  `partialize`d to just `boundaries` — the in-progress `drawingPlanId`/`draftPoints` are
+  deliberately *not* persisted, or a page reload would permanently strand the map in draw-mode).
+  Since this is a static site with no backend, a drawn boundary never leaves the browser it was
+  drawn in; `components/filters/BoundaryExport.tsx` serializes all boundaries to JSON (clipboard,
+  with a `<textarea>` fallback for when `navigator.clipboard` is blocked) so a user can hand that
+  JSON to Claude in a future session to commit permanently (e.g. into a new
+  `geo/plan_boundaries.geojson`) — same pattern as the README's 업데이트 루프, just for geometry
+  instead of CSV rows.
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both

@@ -26,6 +26,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const boundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
   const draftPolygonRef = useRef<KakaoPolygon | null>(null);
+  const draftVertexMarkersRef = useRef<KakaoMarker[]>([]);
   const drawStartedForRef = useRef<string | null>(null);
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
@@ -34,6 +35,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const drawingPlanId = useBoundaryStore((s) => s.drawingPlanId);
   const draftPoints = useBoundaryStore((s) => s.draftPoints);
   const addDraftPoint = useBoundaryStore((s) => s.addDraftPoint);
+  const updateDraftPoint = useBoundaryStore((s) => s.updateDraftPoint);
 
   const scoredById = useMemo(() => {
     const ranked = rankPlans(features, weights);
@@ -59,7 +61,8 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     };
   }, []);
 
-  // 사업 마커
+  // 사업 마커 — 직접 그린 경계가 있는 사업은 폴리곤이 위치를 대신 표시하므로
+  // 원형 마커를 중복으로 띄우지 않는다(폴리곤 자체가 클릭 대상이 됨).
   useEffect(() => {
     let cancelled = false;
     loadKakaoMaps().then(() => {
@@ -67,39 +70,45 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       const map = mapRef.current;
 
       overlaysRef.current.forEach((overlay) => overlay.setMap(null));
-      overlaysRef.current = features.map((feature) => {
-        const p = feature.properties;
-        const [lng, lat] = feature.geometry.coordinates;
-        const scored = scoredById.get(p.id);
-        const isSelected = p.id === selectedId;
-        const size = scoreToDiameter(scored?.score ?? 0);
+      overlaysRef.current = features
+        .filter(
+          (feature) =>
+            feature.properties.id !== drawingPlanId && !boundaries[feature.properties.id]
+        )
+        .map((feature) => {
+          const p = feature.properties;
+          const [lng, lat] = feature.geometry.coordinates;
+          const scored = scoredById.get(p.id);
+          const isSelected = p.id === selectedId;
+          const size = scoreToDiameter(scored?.score ?? 0);
 
-        const el = document.createElement("div");
-        el.className = "map-view__marker";
-        el.style.width = `${size}px`;
-        el.style.height = `${size}px`;
-        el.style.background = p.color;
-        el.style.borderColor = isSelected ? "#111827" : "#fff";
-        el.style.borderWidth = isSelected ? "2.5px" : "1.5px";
-        el.title = p.사업명;
-        el.addEventListener("click", () => selectPlan(p.id));
+          const el = document.createElement("div");
+          el.className = "map-view__marker";
+          el.style.width = `${size}px`;
+          el.style.height = `${size}px`;
+          el.style.background = p.color;
+          el.style.borderColor = isSelected ? "#111827" : "#fff";
+          el.style.borderWidth = isSelected ? "2.5px" : "1.5px";
+          el.title = p.사업명;
+          el.addEventListener("click", () => selectPlan(p.id));
 
-        const overlay = new kakao.maps.CustomOverlay({
-          position: new kakao.maps.LatLng(lat, lng),
-          content: el,
-          yAnchor: 0.5,
+          const overlay = new kakao.maps.CustomOverlay({
+            position: new kakao.maps.LatLng(lat, lng),
+            content: el,
+            yAnchor: 0.5,
+          });
+          overlay.setMap(map);
+          return overlay;
         });
-        overlay.setMap(map);
-        return overlay;
-      });
     });
     return () => {
       cancelled = true;
     };
-  }, [features, scoredById, selectedId, selectPlan]);
+  }, [features, scoredById, selectedId, selectPlan, boundaries, drawingPlanId]);
 
   // 사용자가 직접 그린 구역 경계(폴리곤) — 카카오 지도 API가 지적도를 안 줘서
-  // 대신 이 앱 안에서 손으로 그린 경계를 씀 (CLAUDE.md, store/boundaryStore.ts 참고)
+  // 대신 이 앱 안에서 손으로 그린 경계를 씀 (CLAUDE.md, store/boundaryStore.ts 참고).
+  // 이 경계가 있는 사업은 원형 마커 대신 이 폴리곤이 클릭 대상이 된다.
   useEffect(() => {
     let cancelled = false;
     loadKakaoMaps().then(() => {
@@ -111,22 +120,24 @@ export function MapView({ features }: { features: PlanFeature[] }) {
         .filter(([planId]) => planId !== drawingPlanId) // 그리는 중인 건 draft로 따로 렌더
         .map(([planId, points]) => {
           const color = colorById.get(planId) ?? "#6b7280";
+          const isSelected = planId === selectedId;
           const polygon = new kakao.maps.Polygon({
             path: points.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
-            strokeWeight: 2,
+            strokeWeight: isSelected ? 4 : 2,
             strokeColor: color,
             strokeOpacity: 0.9,
             fillColor: color,
             fillOpacity: 0.25,
           });
           polygon.setMap(map);
+          kakao.maps.event.addListener(polygon, "click", () => selectPlan(planId));
           return polygon;
         });
     });
     return () => {
       cancelled = true;
     };
-  }, [boundaries, colorById, drawingPlanId]);
+  }, [boundaries, colorById, drawingPlanId, selectedId, selectPlan]);
 
   // 그리는 중인 경계 미리보기
   useEffect(() => {
@@ -152,6 +163,33 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       cancelled = true;
     };
   }, [drawingPlanId, draftPoints, colorById]);
+
+  // 그리는 중인 점마다 드래그 가능한 마커를 얹어 특정 점만 위치 수정 가능하게 함
+  // (전체를 다시 그릴 필요 없이 잘못 찍은 점 하나만 옮길 수 있음)
+  useEffect(() => {
+    let cancelled = false;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current) return;
+      draftVertexMarkersRef.current.forEach((marker) => marker.setMap(null));
+      draftVertexMarkersRef.current = [];
+      if (!drawingPlanId) return;
+      draftVertexMarkersRef.current = draftPoints.map((pt, index) => {
+        const marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(pt.lat, pt.lng),
+          draggable: true,
+        });
+        marker.setMap(mapRef.current);
+        kakao.maps.event.addListener(marker, "dragend", () => {
+          const pos = marker.getPosition();
+          updateDraftPoint(index, { lat: pos.getLat(), lng: pos.getLng() });
+        });
+        return marker;
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [drawingPlanId, draftPoints, updateDraftPoint]);
 
   // 그리기 시작 시점에만(다시 그리기 포함) 해당 사업 위치로 바짝 확대 —
   // 도로/필지 경계를 보고 정밀하게 점을 찍을 수 있어야 함. 그리는 도중

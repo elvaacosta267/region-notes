@@ -15,6 +15,7 @@ interface BoundaryState {
   draftPoints: LatLng[];
   startDrawing: (planId: string) => void;
   addDraftPoint: (point: LatLng) => void;
+  updateDraftPoint: (index: number, point: LatLng) => void;
   undoLastPoint: () => void;
   finishDrawing: () => void;
   cancelDrawing: () => void;
@@ -33,6 +34,11 @@ export const useBoundaryStore = create<BoundaryState>()(
 
       addDraftPoint: (point) =>
         set((state) => ({ draftPoints: [...state.draftPoints, point] })),
+
+      updateDraftPoint: (index, point) =>
+        set((state) => ({
+          draftPoints: state.draftPoints.map((p, i) => (i === index ? point : p)),
+        })),
 
       undoLastPoint: () =>
         set((state) => ({ draftPoints: state.draftPoints.slice(0, -1) })),
