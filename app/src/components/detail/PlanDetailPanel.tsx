@@ -3,7 +3,7 @@ import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
-import { planDisplayName } from "../../lib/planDisplayName";
+import { commitNameOverride, planDisplayName } from "../../lib/planDisplayName";
 import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
@@ -23,13 +23,22 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
   const setNameOverride = usePlanOverrideStore((s) => s.setNameOverride);
   const clearNameOverride = usePlanOverrideStore((s) => s.clearNameOverride);
+  const notes = usePlanOverrideStore((s) => s.notes);
+  const setNote = usePlanOverrideStore((s) => s.setNote);
+  const extraLinks = usePlanOverrideStore((s) => s.extraLinks);
+  const setExtraLink = usePlanOverrideStore((s) => s.setExtraLink);
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
+  const [noteDraft, setNoteDraft] = useState("");
+  const [linkDraft, setLinkDraft] = useState("");
 
-  // 다른 사업을 선택하면 편집 중이던 상태가 새 사업에 남아있으면 안 됨
+  // 다른 사업을 선택하면 편집 중이던 상태/메모·링크 입력칸이 새 사업에 남아있으면 안 됨
+  const featureId = feature?.properties.id;
   useEffect(() => {
     setEditingName(false);
-  }, [feature?.properties.id]);
+    setNoteDraft(featureId ? (notes[featureId] ?? "") : "");
+    setLinkDraft(featureId ? (extraLinks[featureId] ?? "") : "");
+  }, [featureId, notes, extraLinks]);
 
   if (!feature) {
     return (
@@ -47,12 +56,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const name = planDisplayName(p.id, p.사업명, nameOverrides);
 
   const commitName = () => {
-    const trimmed = nameDraft.trim();
-    if (!trimmed || trimmed === p.사업명) {
-      clearNameOverride(p.id);
-    } else {
-      setNameOverride(p.id, trimmed);
-    }
+    commitNameOverride(p.id, p.사업명, nameDraft, setNameOverride, clearNameOverride);
     setEditingName(false);
   };
 
@@ -188,6 +192,38 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         <dt>비고</dt>
         <dd>{p.비고}</dd>
       </dl>
+
+      <div className="plan-detail__user-notes">
+        <label className="plan-detail__user-notes-label" htmlFor="plan-detail-memo">
+          메모
+        </label>
+        <textarea
+          id="plan-detail-memo"
+          className="plan-detail__memo"
+          value={noteDraft}
+          placeholder="이 사업에 대해 기록해두고 싶은 내용을 적어보세요 (이 브라우저에만 저장됩니다)"
+          onChange={(e) => setNoteDraft(e.target.value)}
+          onBlur={() => setNote(p.id, noteDraft)}
+        />
+        <label className="plan-detail__user-notes-label" htmlFor="plan-detail-link">
+          관련 링크
+        </label>
+        <div className="plan-detail__extra-link">
+          <input
+            id="plan-detail-link"
+            type="text"
+            value={linkDraft}
+            placeholder="뉴스·블로그 등에서 찾은 관련 링크를 붙여넣으세요"
+            onChange={(e) => setLinkDraft(e.target.value)}
+            onBlur={() => setExtraLink(p.id, linkDraft)}
+          />
+          {extraLinks[p.id] && (
+            <a href={extraLinks[p.id]} target="_blank" rel="noopener noreferrer">
+              열기 ↗
+            </a>
+          )}
+        </div>
+      </div>
 
       <div className="plan-detail__links">
         {p.출처URL && (

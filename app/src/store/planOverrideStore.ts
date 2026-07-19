@@ -7,14 +7,20 @@ import { persist } from "zustand/middleware";
 // 오버라이드로 표시하고, boundaryStore와 마찬가지로 브라우저에만 저장한다.
 interface PlanOverrideState {
   nameOverrides: Record<string, string>;
+  notes: Record<string, string>;
+  extraLinks: Record<string, string>;
   setNameOverride: (planId: string, name: string) => void;
   clearNameOverride: (planId: string) => void;
+  setNote: (planId: string, text: string) => void;
+  setExtraLink: (planId: string, url: string) => void;
 }
 
 export const usePlanOverrideStore = create<PlanOverrideState>()(
   persist(
     (set) => ({
       nameOverrides: {},
+      notes: {},
+      extraLinks: {},
 
       setNameOverride: (planId, name) =>
         set((state) => ({
@@ -26,6 +32,24 @@ export const usePlanOverrideStore = create<PlanOverrideState>()(
           const next = { ...state.nameOverrides };
           delete next[planId];
           return { nameOverrides: next };
+        }),
+
+      // 메모/관련 링크도 사업명 오버라이드와 같은 이유로 로컬(브라우저)에만 저장한다 —
+      // 사용자가 직접 남기는 참고용 부가정보라 plans.csv(공식 데이터)에 섞지 않는다.
+      setNote: (planId, text) =>
+        set((state) => {
+          const next = { ...state.notes };
+          if (text.trim()) next[planId] = text;
+          else delete next[planId];
+          return { notes: next };
+        }),
+
+      setExtraLink: (planId, url) =>
+        set((state) => {
+          const next = { ...state.extraLinks };
+          if (url.trim()) next[planId] = url.trim();
+          else delete next[planId];
+          return { extraLinks: next };
         }),
     }),
     { name: "region-notes-plan-name-overrides" }

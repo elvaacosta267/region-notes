@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
-import { planDisplayName } from "../../lib/planDisplayName";
+import { commitNameOverride, planDisplayName } from "../../lib/planDisplayName";
 import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
@@ -48,6 +48,15 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
   const selectedId = useRankingStore((s) => s.selectedId);
   const selectPlan = useRankingStore((s) => s.selectPlan);
   const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
+  const setNameOverride = usePlanOverrideStore((s) => s.setNameOverride);
+  const clearNameOverride = usePlanOverrideStore((s) => s.clearNameOverride);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState("");
+
+  const commitEdit = (planId: string, officialName: string) => {
+    commitNameOverride(planId, officialName, nameDraft, setNameOverride, clearNameOverride);
+    setEditingId(null);
+  };
 
   const ranked = useMemo(() => rankPlans(features, weights), [features, weights]);
 
@@ -101,7 +110,37 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 <td className="ranking-table__name">
                   <span className="ranking-table__name-row">
                     <span className="ranking-table__dot" style={{ background: p.color }} />
-                    {name}
+                    {editingId === p.id ? (
+                      <input
+                        className="ranking-table__name-input"
+                        value={nameDraft}
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setNameDraft(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitEdit(p.id, p.사업명);
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                        onBlur={() => commitEdit(p.id, p.사업명)}
+                      />
+                    ) : (
+                      <>
+                        {name}
+                        <button
+                          type="button"
+                          className="ranking-table__name-edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNameDraft(name);
+                            setEditingId(p.id);
+                          }}
+                          title="이름 수정"
+                          aria-label="이름 수정"
+                        >
+                          ✏️
+                        </button>
+                      </>
+                    )}
                     {hasRecentUpdate && (
                       <a
                         className="ranking-table__update-badge"

@@ -85,6 +85,34 @@
   flex-shrink: 0;
 }
 
+.ranking-table__name-edit {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.4;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ranking-table__name-edit:hover {
+  opacity: 1;
+}
+
+.ranking-table__name-input {
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+  min-width: 100px;
+  padding: 1px 4px;
+  border: 1px solid var(--border, #333);
+  border-radius: 4px;
+  background: var(--bg, transparent);
+  color: inherit;
+}
+
 .ranking-table__update-badge {
   font-size: 10px;
   font-weight: 700;
