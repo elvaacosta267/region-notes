@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { LatLng } from "../../store/boundaryStore";
 import type { PlanFeature } from "../../lib/types";
+import type { AdminBoundaryGeoJSON } from "../../hooks/useBupyeongBoundary";
 import { rankPlans } from "../../lib/computeScore";
 import { planDisplayName } from "../../lib/planDisplayName";
 import { useRankingStore } from "../../store/rankingStore";
@@ -30,12 +31,19 @@ function averageCenter(points: LatLng[]): LatLng {
   return { lat, lng };
 }
 
-export function MapView({ features }: { features: PlanFeature[] }) {
+export function MapView({
+  features,
+  adminBoundary,
+}: {
+  features: PlanFeature[];
+  adminBoundary: AdminBoundaryGeoJSON | null | undefined; // undefined = 아직 로딩 중
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<KakaoMap | null>(null);
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const boundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
   const boundaryLabelsRef = useRef<KakaoCustomOverlay[]>([]);
+  const adminBoundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
   const draftPolygonRef = useRef<KakaoPolygon | null>(null);
   const draftVertexMarkersRef = useRef<KakaoMarker[]>([]);
   const drawStartedForRef = useRef<string | null>(null);
@@ -85,27 +93,73 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     };
   }, []);
 
-  // 처음 화면을 열었을 때(아직 아무 사업도 선택 안 함)는 고정된 대략적 중심좌표 대신
-  // 부평구 전체 사업 좌표가 한 화면에 다 들어오도록 맞춘다 — 개별 마커는 작게 보여도
-  // "전체 개발현황을 한눈에" 보는 게 우선. 한 번 맞추고 나면(사용자가 뭔가 선택하면
-  // 아래 "선택된 사업으로 이동" 효과가 대신 담당) 다시 전체로 되돌리지 않는다.
+  // 부평구 실제 행정동 경계(통계청 SGIS 원자료, tools/fetch_bupyeong_boundary.py로
+  // 받음) — 임의로 근사한 도형이 아니라 실제 공개 데이터다. 개별 사업 경계와 구분되는
+  // 옅은 회색 점선으로, 클릭 상호작용 없이 배경 맥락으로만 깐다.
   useEffect(() => {
-    if (hasFitInitialBoundsRef.current || features.length === 0) return;
+    let cancelled = false;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current || !adminBoundary) return;
+      const map = mapRef.current;
+      adminBoundaryPolygonsRef.current.forEach((poly) => poly.setMap(null));
+      adminBoundaryPolygonsRef.current = adminBoundary.features.flatMap((feature) =>
+        feature.geometry.coordinates.map((polygon) => {
+          const path = polygon[0].map(([lng, lat]) => new kakao.maps.LatLng(lat, lng));
+          const poly = new kakao.maps.Polygon({
+            path,
+            strokeWeight: 1.5,
+            strokeColor: "#6b7280",
+            strokeOpacity: 0.8,
+            strokeStyle: "shortdash",
+            fillOpacity: 0,
+          });
+          poly.setMap(map);
+          return poly;
+        })
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [adminBoundary]);
+
+  // 처음 화면을 열었을 때(아직 아무 사업도 선택 안 함)는 고정된 대략적 중심좌표 대신
+  // 부평구 전체가 한 화면에 다 들어오도록 맞춘다 — 개별 마커는 작게 보여도 "전체
+  // 개발현황을 한눈에" 보는 게 우선. 행정동 경계가 로딩되면 그 실제 경계 범위를
+  // 쓰고(사업 좌표보다 부평구 전체를 더 정확히 대표함), 아직이거나 못 받아왔으면
+  // 사업 좌표들로라도 맞춘다. 한 번 맞추고 나면(사용자가 뭔가 선택하면 아래
+  // "선택된 사업으로 이동" 효과가 대신 담당) 다시 전체로 되돌리지 않는다.
+  useEffect(() => {
+    if (hasFitInitialBoundsRef.current) return;
+    if (adminBoundary === undefined) return; // 아직 로딩 중 — 있으면 그걸 우선 쓰려고 기다림
+    if (!adminBoundary && features.length === 0) return;
     let cancelled = false;
     loadKakaoMaps().then(() => {
       if (cancelled || !mapRef.current || hasFitInitialBoundsRef.current) return;
       const bounds = new kakao.maps.LatLngBounds();
-      features.forEach((f) => {
-        const [lng, lat] = f.geometry.coordinates;
-        bounds.extend(new kakao.maps.LatLng(lat, lng));
-      });
+      if (adminBoundary) {
+        adminBoundary.features.forEach((feature) => {
+          feature.geometry.coordinates.forEach((polygon) => {
+            polygon[0].forEach(([lng, lat]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
+          });
+        });
+      } else {
+        features.forEach((f) => {
+          const [lng, lat] = f.geometry.coordinates;
+          bounds.extend(new kakao.maps.LatLng(lat, lng));
+        });
+      }
       mapRef.current.setBounds(bounds);
+      // 부평구 실제 면적은 컨테이너보다 세로로 더 좁은 비율이라 setBounds만 쓰면
+      // (가로를 맞추려고) 인천 시청·부천까지 보일 만큼 과하게 축소된다 — 추적 중인
+      // 사업 좌표가 전부 화면에 들어오는 선에서 레벨을 한 번 더 조여준다.
+      mapRef.current.setLevel(Math.min(mapRef.current.getLevel(), 8));
       hasFitInitialBoundsRef.current = true;
     });
     return () => {
       cancelled = true;
     };
-  }, [features]);
+  }, [features, adminBoundary]);
 
   // "지도 크게 보기" 토글 등으로 컨테이너 크기가 CSS로만 바뀌면 카카오맵은 이를
   // 자동 감지하지 못해 기존 캔버스 크기로 굳어버린다(빈 공간이 생김) — ResizeObserver로

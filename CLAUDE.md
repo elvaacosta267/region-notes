@@ -71,6 +71,24 @@ with a real, non-placeholder 착공 date get a computed estimate; everything els
 `"확인필요(...)"` string. Re-run this script whenever a plan's stage changes — "keeping this up to
 date" is not a background job, it's re-running the pipeline (see README's 업데이트 루프).
 
+### One-off administrative boundary fetch (`tools/fetch_bupyeong_boundary.py`)
+```bash
+python3 tools/fetch_bupyeong_boundary.py  # -> geo/bupyeong_boundary.geojson
+python3 tools/build_geo.py
+```
+Downloads the nationwide 행정동 (administrative-dong) boundary GeoJSON from
+[vuski/admdongkor](https://github.com/vuski/admdongkor) (a processed re-release of Statistics
+Korea SGIS data under KOGL Type 1, itself CC BY 4.0 — attribution must be preserved on reuse, see
+that repo's `LICENSE-DATA`) and filters it down to 부평구's 22 행정동. This exists because the map
+needs a *real* 부평구 outline to fit the initial view to and to draw as background context — same
+"never fabricate a boundary" principle as the user-drawn plan boundaries
+(`store/boundaryStore.ts`). The output is 22 separate 행정동 polygons, not one merged 구ー-level
+outline (merging would need real polygon-union, e.g. shapely, which breaks this pipeline's
+stdlib-only rule) — rendering all 22 together already traces 부평구's true outline, just with the
+internal dong-to-dong lines also visible. Re-run only if the source repo's admin boundaries
+change (rare) or a newer `verYYYYMMDD` directory should be used instead of the hardcoded
+`SOURCE_URL`.
+
 ### React app (`app/`)
 ```bash
 cd app
@@ -217,6 +235,19 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   JSON to Claude in a future session to commit permanently (e.g. into a new
   `geo/plan_boundaries.geojson`) — same pattern as the README's 업데이트 루프, just for geometry
   instead of CSV rows.
+- `hooks/useBupyeongBoundary.ts` fetches `geo/bupyeong_boundary.geojson` (real 부평구 행정동
+  boundaries, see `tools/fetch_bupyeong_boundary.py` above) and `MapView.tsx` renders it as a
+  thin gray dashed `kakao.maps.Polygon` per 행정동 — non-interactive background context, styled
+  distinctly from the colored/selectable user-drawn plan boundaries. It's also what the
+  "no plan selected yet" initial view fits to (`LatLngBounds` over every 행정동's coordinates)
+  instead of just the tracked plans' points, so opening the app shows all of 부평구 even before
+  any project is added near an edge. A plain bounds-fit still overshoots on screen because
+  부평구's real aspect ratio is narrower (taller relative to width) than the map panel's — Kakao
+  has to zoom out until the *shorter* axis fits, which drags in Bucheon/Yeongdeungpo-gu on the
+  wider axis — so after `setBounds()` the level is additionally clamped to `8` (empirically the
+  loosest level at which zero tracked-plan markers fall outside the visible container at this
+  panel's typical size; re-check `outside` count in devtools if the layout's aspect ratio
+  changes materially before adjusting this constant).
 - `components/ranking/RankingTable.tsx` is the primary UI (not the map) — it always renders the
   full ranked list, not a top-N slice.
 - `lib/computeScore.ts` is the single place weighted scores and grades are computed; both

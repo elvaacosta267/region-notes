@@ -67,6 +67,7 @@ declare global {
         strokeWeight?: number;
         strokeColor?: string;
         strokeOpacity?: number;
+        strokeStyle?: string;
         fillColor?: string;
         fillOpacity?: number;
       }) => KakaoPolygon;
