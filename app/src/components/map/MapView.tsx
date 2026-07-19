@@ -2,10 +2,13 @@
 // 지도 렌더링을 분리해서 설계했으니, 나중에 지도 라이브러리를 다시 바꿀 때도 이 파일만
 // 새로 작성하면 된다.
 import { useEffect, useMemo, useRef } from "react";
+import type { LatLng } from "../../store/boundaryStore";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
+import { planDisplayName } from "../../lib/planDisplayName";
 import { useRankingStore } from "../../store/rankingStore";
 import { useBoundaryStore } from "../../store/boundaryStore";
+import { usePlanOverrideStore } from "../../store/planOverrideStore";
 import { loadKakaoMaps } from "../../lib/kakaoMapLoader";
 import "./MapView.css";
 
@@ -20,11 +23,19 @@ function scoreToDiameter(score: number): number {
   return 12 + (score / 100) * 20;
 }
 
+// 라벨을 어디에 띄울지 정하는 용도라 정확한 폴리곤 중심(centroid)일 필요는 없음 — 꼭짓점 평균이면 충분
+function averageCenter(points: LatLng[]): LatLng {
+  const lat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
+  const lng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
+  return { lat, lng };
+}
+
 export function MapView({ features }: { features: PlanFeature[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<KakaoMap | null>(null);
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const boundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
+  const boundaryLabelsRef = useRef<KakaoCustomOverlay[]>([]);
   const draftPolygonRef = useRef<KakaoPolygon | null>(null);
   const draftVertexMarkersRef = useRef<KakaoMarker[]>([]);
   const drawStartedForRef = useRef<string | null>(null);
@@ -36,6 +47,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const draftPoints = useBoundaryStore((s) => s.draftPoints);
   const addDraftPoint = useBoundaryStore((s) => s.addDraftPoint);
   const updateDraftPoint = useBoundaryStore((s) => s.updateDraftPoint);
+  const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
 
   const scoredById = useMemo(() => {
     const ranked = rankPlans(features, weights);
@@ -45,6 +57,17 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const colorById = useMemo(
     () => new Map(features.map((f) => [f.properties.id, f.properties.color])),
     [features]
+  );
+
+  const nameById = useMemo(
+    () =>
+      new Map(
+        features.map((f) => [
+          f.properties.id,
+          planDisplayName(f.properties.id, f.properties.사업명, nameOverrides),
+        ])
+      ),
+    [features, nameOverrides]
   );
 
   useEffect(() => {
@@ -59,6 +82,18 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // "지도 크게 보기" 토글 등으로 컨테이너 크기가 CSS로만 바뀌면 카카오맵은 이를
+  // 자동 감지하지 못해 기존 캔버스 크기로 굳어버린다(빈 공간이 생김) — ResizeObserver로
+  // 컨테이너 크기 변화를 감지해 매번 relayout()을 호출해야 지도가 새 크기를 채운다.
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.relayout();
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
   // 사업 마커 — 직접 그린 경계가 있는 사업은 폴리곤이 위치를 대신 표시하므로
@@ -89,7 +124,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
           el.style.background = p.color;
           el.style.borderColor = isSelected ? "#111827" : "#fff";
           el.style.borderWidth = isSelected ? "2.5px" : "1.5px";
-          el.title = p.사업명;
+          el.title = nameById.get(p.id) ?? p.사업명;
           el.addEventListener("click", () => selectPlan(p.id));
 
           const overlay = new kakao.maps.CustomOverlay({
@@ -104,11 +139,14 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     return () => {
       cancelled = true;
     };
-  }, [features, scoredById, selectedId, selectPlan, boundaries, drawingPlanId]);
+  }, [features, scoredById, selectedId, selectPlan, boundaries, drawingPlanId, nameById]);
 
   // 사용자가 직접 그린 구역 경계(폴리곤) — 카카오 지도 API가 지적도를 안 줘서
   // 대신 이 앱 안에서 손으로 그린 경계를 씀 (CLAUDE.md, store/boundaryStore.ts 참고).
-  // 이 경계가 있는 사업은 원형 마커 대신 이 폴리곤이 클릭 대상이 된다.
+  // 이 경계가 있는 사업은 원형 마커 대신 이 폴리곤이 클릭 대상이 된다. 선택된 구역만
+  // 굵은 색 테두리로 강조하고 나머지는 회색으로 눌러줘야 "여러 구역이 같이 겹쳐
+  // 보인다"는 혼란이 안 생긴다 — fill은 그대로 카테고리 색으로 남겨 구분은 유지.
+  // 중심에는 사업명 라벨을 얹어 폴리곤만 봐도 어떤 구역인지 바로 알 수 있게 한다.
   useEffect(() => {
     let cancelled = false;
     loadKakaoMaps().then(() => {
@@ -116,28 +154,48 @@ export function MapView({ features }: { features: PlanFeature[] }) {
       const map = mapRef.current;
 
       boundaryPolygonsRef.current.forEach((poly) => poly.setMap(null));
-      boundaryPolygonsRef.current = Object.entries(boundaries)
-        .filter(([planId]) => planId !== drawingPlanId) // 그리는 중인 건 draft로 따로 렌더
-        .map(([planId, points]) => {
-          const color = colorById.get(planId) ?? "#6b7280";
-          const isSelected = planId === selectedId;
-          const polygon = new kakao.maps.Polygon({
-            path: points.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
-            strokeWeight: isSelected ? 2 : 1,
-            strokeColor: color,
-            strokeOpacity: 0.9,
-            fillColor: color,
-            fillOpacity: 0.25,
-          });
-          polygon.setMap(map);
-          kakao.maps.event.addListener(polygon, "click", () => selectPlan(planId));
-          return polygon;
+      boundaryLabelsRef.current.forEach((label) => label.setMap(null));
+
+      const entries = Object.entries(boundaries).filter(
+        ([planId]) => planId !== drawingPlanId // 그리는 중인 건 draft로 따로 렌더
+      );
+
+      boundaryPolygonsRef.current = entries.map(([planId, points]) => {
+        const color = colorById.get(planId) ?? "#6b7280";
+        const isSelected = planId === selectedId;
+        const polygon = new kakao.maps.Polygon({
+          path: points.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
+          strokeWeight: isSelected ? 3 : 1,
+          strokeColor: isSelected ? color : "#9ca3af",
+          strokeOpacity: isSelected ? 0.95 : 0.5,
+          fillColor: color,
+          fillOpacity: isSelected ? 0.3 : 0.12,
         });
+        polygon.setMap(map);
+        kakao.maps.event.addListener(polygon, "click", () => selectPlan(planId));
+        return polygon;
+      });
+
+      boundaryLabelsRef.current = entries.map(([planId, points]) => {
+        const center = averageCenter(points);
+        const isSelected = planId === selectedId;
+        const el = document.createElement("div");
+        el.className = `map-view__zone-label ${isSelected ? "map-view__zone-label--selected" : ""}`;
+        el.textContent = nameById.get(planId) ?? planId;
+        const label = new kakao.maps.CustomOverlay({
+          position: new kakao.maps.LatLng(center.lat, center.lng),
+          content: el,
+          yAnchor: 0.5,
+          zIndex: isSelected ? 20 : 10,
+        });
+        label.setMap(map);
+        return label;
+      });
     });
     return () => {
       cancelled = true;
     };
-  }, [boundaries, colorById, drawingPlanId, selectedId, selectPlan]);
+  }, [boundaries, colorById, nameById, drawingPlanId, selectedId, selectPlan]);
 
   // 그리는 중인 경계 미리보기
   useEffect(() => {

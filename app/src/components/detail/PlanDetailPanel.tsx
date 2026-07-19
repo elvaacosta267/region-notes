@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
+import { planDisplayName } from "../../lib/planDisplayName";
 import { useRankingStore } from "../../store/rankingStore";
+import { usePlanOverrideStore } from "../../store/planOverrideStore";
 import "./PlanDetailPanel.css";
 
 const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanFeature["properties"]; label: string }[] = [
@@ -16,6 +19,16 @@ const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanF
 
 export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const weights = useRankingStore((s) => s.weights);
+  const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
+  const setNameOverride = usePlanOverrideStore((s) => s.setNameOverride);
+  const clearNameOverride = usePlanOverrideStore((s) => s.clearNameOverride);
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+
+  // 다른 사업을 선택하면 편집 중이던 상태가 새 사업에 남아있으면 안 됨
+  useEffect(() => {
+    setEditingName(false);
+  }, [feature?.properties.id]);
 
   if (!feature) {
     return (
@@ -30,10 +43,63 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const grade = computeGrade(score);
   const horizon = computeInvestmentHorizon(feature);
   const zoneLabel = officialZoneLabel(p.비고);
+  const name = planDisplayName(p.id, p.사업명, nameOverrides);
+
+  const commitName = () => {
+    const trimmed = nameDraft.trim();
+    if (!trimmed || trimmed === p.사업명) {
+      clearNameOverride(p.id);
+    } else {
+      setNameOverride(p.id, trimmed);
+    }
+    setEditingName(false);
+  };
 
   return (
     <div className="plan-detail">
-      <h2 className="plan-detail__title">{p.사업명}</h2>
+      <h2 className="plan-detail__title">
+        {editingName ? (
+          <input
+            className="plan-detail__title-input"
+            value={nameDraft}
+            autoFocus
+            onChange={(e) => setNameDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitName();
+              if (e.key === "Escape") setEditingName(false);
+            }}
+            onBlur={commitName}
+          />
+        ) : (
+          <>
+            {name}
+            <button
+              type="button"
+              className="plan-detail__title-edit"
+              onClick={() => {
+                setNameDraft(name);
+                setEditingName(true);
+              }}
+              title="이름 수정"
+              aria-label="이름 수정"
+            >
+              ✏️
+            </button>
+          </>
+        )}
+      </h2>
+      {nameOverrides[p.id] && !editingName && (
+        <div className="plan-detail__name-original">
+          원래 표기: {p.사업명}{" "}
+          <button
+            type="button"
+            className="plan-detail__name-reset"
+            onClick={() => clearNameOverride(p.id)}
+          >
+            되돌리기
+          </button>
+        </div>
+      )}
       <div className="plan-detail__meta">
         {p.사업유형} · {p.시도} {p.시군구} {p.읍면동} · 현재단계: {p.현재단계}
       </div>
@@ -113,7 +179,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
             출처 원문 ↗
           </a>
         )}
-        <a href={naverSearchUrl(p.사업명)} target="_blank" rel="noopener noreferrer">
+        <a href={naverSearchUrl(name)} target="_blank" rel="noopener noreferrer">
           네이버에서 검색 ↗
         </a>
       </div>

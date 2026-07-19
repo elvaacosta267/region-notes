@@ -3,7 +3,9 @@ import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
+import { planDisplayName } from "../../lib/planDisplayName";
 import { useRankingStore } from "../../store/rankingStore";
+import { usePlanOverrideStore } from "../../store/planOverrideStore";
 import "./RankingTable.css";
 
 const GRADE_CLASS: Record<string, string> = {
@@ -16,6 +18,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
   const selectPlan = useRankingStore((s) => s.selectPlan);
+  const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
 
   const ranked = useMemo(() => rankPlans(features, weights), [features, weights]);
 
@@ -57,6 +60,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
             const isSelected = p.id === selectedId;
             const zoneLabel = officialZoneLabel(p.비고);
             const isDuplicateZone = zoneLabel ? (zoneLabelCounts.get(zoneLabel) ?? 0) > 1 : false;
+            const name = planDisplayName(p.id, p.사업명, nameOverrides);
             return (
               <tr
                 key={p.id}
@@ -67,7 +71,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 <td className="ranking-table__name">
                   <span className="ranking-table__name-row">
                     <span className="ranking-table__dot" style={{ background: p.color }} />
-                    {p.사업명}
+                    {name}
                   </span>
                   {zoneLabel && (
                     <div
@@ -97,7 +101,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 <td className="ranking-table__completion">{p.예상완공시기}</td>
                 <td className="ranking-table__links">
                   <a
-                    href={naverSearchUrl(p.사업명)}
+                    href={naverSearchUrl(name)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
