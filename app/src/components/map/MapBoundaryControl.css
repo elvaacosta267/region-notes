@@ -1,0 +1,41 @@
+.map-boundary-control {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  max-width: 260px;
+  background: var(--legend-bg, rgba(20, 20, 20, 0.9));
+  color: var(--legend-fg, #eee);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-boundary-control--empty {
+  opacity: 0.8;
+}
+
+.map-boundary-control__hint {
+  margin: 0;
+}
+
+.map-boundary-control__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.map-boundary-control button {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--legend-fg, #eee);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}

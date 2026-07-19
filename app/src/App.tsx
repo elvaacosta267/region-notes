@@ -3,7 +3,7 @@ import { usePlansData } from "./hooks/usePlansData";
 import { useRankingStore } from "./store/rankingStore";
 import { RankingTable } from "./components/ranking/RankingTable";
 import { MapView } from "./components/map/MapView";
-import { Legend } from "./components/map/Legend";
+import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
 import { BoundaryExport } from "./components/filters/BoundaryExport";
@@ -63,7 +63,7 @@ function App() {
         <div className="app__right">
           <div className="app__map">
             <MapView features={features} />
-            <Legend />
+            <MapBoundaryControl />
           </div>
           <div className="app__detail">
             <PlanDetailPanel feature={selectedFeature} />
