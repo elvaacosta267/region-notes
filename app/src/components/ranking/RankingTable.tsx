@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
-import { naverSearchUrl } from "../../lib/naverSearchLink";
+import { naverSearchUrl, naverLandMapUrl } from "../../lib/naverSearchLink";
 import { officialZoneLabel } from "../../lib/officialZoneLabel";
-import { commitNameOverride, planDisplayName } from "../../lib/planDisplayName";
+import { commitNameOverride, planDisplayName, planShortDisplayName } from "../../lib/planDisplayName";
+import { priceShortLabel } from "../../lib/priceShortLabel";
 import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
@@ -125,7 +126,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                       />
                     ) : (
                       <>
-                        {name}
+                        <span title={name}>{planShortDisplayName(name)}</span>
                         <button
                           type="button"
                           className="ranking-table__name-edit"
@@ -178,7 +179,9 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                   </span>
                 </td>
                 <td>{sp.investmentHorizon}</td>
-                <td className="ranking-table__price">{p.대략가격대}</td>
+                <td className="ranking-table__price" title={p.대략가격대}>
+                  {priceShortLabel(p.대략가격대)}
+                </td>
                 <td>
                   <StageProgressTiles index={p.A_stage_index} total={p.A_stage_total} color={p.color} />
                 </td>
@@ -191,6 +194,18 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                     className="ranking-table__link"
                   >
                     네이버 검색 ↗
+                  </a>
+                  <a
+                    href={naverLandMapUrl(
+                      sp.feature.geometry.coordinates[1],
+                      sp.feature.geometry.coordinates[0]
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="ranking-table__link"
+                  >
+                    네이버 매물지도 ↗
                   </a>
                 </td>
               </tr>

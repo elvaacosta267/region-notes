@@ -30,14 +30,18 @@ UPDATE_FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
 UPDATE_ID_BULLET_RE = re.compile(r"^-\s*\[id:\s*([^\]]+)\]\s*(.+)$")
 UPDATE_SOURCE_RE = re.compile(r"^\s*-\s*출처:\s*(\S+)")
 
-# 사업유형별 색상 (지도/KML 스타일용) — db/schema.md 의 사업유형 값과 1:1 대응
+# 사업유형별 색상 (지도/KML 스타일용) — db/schema.md 의 사업유형 값과 1:1 대응.
+# 재개발/재건축(도시정비법)은 기존에 amber(#d97706)/orange(#ea580c)로 서로 비슷했고,
+# 특히 카카오맵 기본 POI가 아파트를 살구색 계열로 표시해 우리 마커와 구분이 안 됐다
+# (지도에서 "이게 카카오 기본 아파트 아이콘인지 우리 투자대상 마커인지" 헷갈림) —
+# 그래서 이 두 카테고리는 주황/살구 계열을 완전히 빼고 채도 높은 마젠타/보라로 교체.
 CATEGORY_COLOR = {
     "신도시(공공주택지구)": "#2563eb",   # blue
     "택지개발": "#2563eb",              # blue (신도시와 동일 계열)
     "광역교통": "#dc2626",              # red
     "재건축(노후계획도시)": "#059669",   # green
-    "재개발": "#d97706",                # amber
-    "재건축(도시정비법)": "#ea580c",     # orange
+    "재개발": "#db2777",                # magenta/pink
+    "재건축(도시정비법)": "#7c3aed",     # violet
     "주거환경개선": "#0891b2",           # cyan
 }
 DEFAULT_COLOR = "#6b7280"  # gray

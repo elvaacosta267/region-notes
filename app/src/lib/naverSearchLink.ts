@@ -9,3 +9,11 @@ export function naverSearchUrl(planName: string): string {
   const query = `${planSearchName(planName)} 매물`;
   return `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`;
 }
+
+// 네이버부동산은 이름 검색은 딥링크가 안 되지만, 지도 중심좌표(ms=lat,lng,zoom)로
+// 여는 URL은 공개적으로 통용되는 방식이라 plans.csv의 lat/lng으로 해당 구역 근방
+// 매물 지도를 바로 띄울 수 있다. a=매물종류(아파트/분양권/재건축/빌라/단독다가구),
+// e=RETAIL(상가)까지 넓게 잡아 이 프로젝트가 다루는 자산유형(아파트~상가)을 포괄한다.
+export function naverLandMapUrl(lat: number, lng: number): string {
+  return `https://new.land.naver.com/search?ms=${lat},${lng},17&a=APT:ABYG:JGC:PRE:JWJT:DDDGG:VL&e=RETAIL`;
+}
