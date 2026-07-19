@@ -224,15 +224,26 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     };
   }, [drawingPlanId, addDraftPoint]);
 
+  // 선택된 사업으로 지도 이동 — 직접 그린 경계가 있으면 그 경계가 실제
+  // 위치이므로 경계 전체가 보이도록 맞추고, 없으면 (원래 근사치일 수 있는)
+  // 사업 좌표로 이동한다. 경계 좌표는 사용자가 직접 찍은 정밀한 위치라
+  // plans.csv의 동단위 근사 좌표보다 우선한다.
   useEffect(() => {
     if (!selectedId || !mapRef.current || drawingPlanId) return;
+    const boundary = boundaries[selectedId];
+    if (boundary && boundary.length > 0) {
+      const bounds = new kakao.maps.LatLngBounds();
+      boundary.forEach((pt) => bounds.extend(new kakao.maps.LatLng(pt.lat, pt.lng)));
+      mapRef.current.setBounds(bounds);
+      return;
+    }
     const feature = features.find((f) => f.properties.id === selectedId);
     if (!feature) return;
     const [lng, lat] = feature.geometry.coordinates;
     const position = new kakao.maps.LatLng(lat, lng);
     mapRef.current.panTo(position);
     mapRef.current.setLevel(SELECTED_LEVEL);
-  }, [selectedId, features, drawingPlanId]);
+  }, [selectedId, features, drawingPlanId, boundaries]);
 
   return (
     <div

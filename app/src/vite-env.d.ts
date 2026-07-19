@@ -25,6 +25,11 @@ declare global {
     panTo(latlng: KakaoLatLng): void;
     setLevel(level: number, options?: { anchor?: KakaoLatLng }): void;
     getLevel(): number;
+    setBounds(bounds: KakaoLatLngBounds): void;
+  }
+
+  interface KakaoLatLngBounds {
+    extend(latlng: KakaoLatLng): void;
   }
 
   interface KakaoCustomOverlay {
@@ -49,6 +54,7 @@ declare global {
       load(callback: () => void): void;
       Map: new (container: HTMLElement, options: { center: unknown; level: number }) => KakaoMap;
       LatLng: new (lat: number, lng: number) => KakaoLatLng;
+      LatLngBounds: new () => KakaoLatLngBounds;
       CustomOverlay: new (options: {
         position: KakaoLatLng;
         content: HTMLElement | string;
