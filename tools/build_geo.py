@@ -103,8 +103,13 @@ def to_geojson(rows):
         pid = row.get("id", "").strip()
         factors = scores.get(pid, {})
         for key, factor in factors.items():
-            props[key] = factor["value"]
-            props[f"{key}_basis"] = factor["basis"]
+            # A_stage_index/A_stage_total처럼 {value, basis} 쌍이 아니라 순수 값 하나만
+            # 담긴 항목(진척도 타일 렌더링용)은 그대로 복사한다.
+            if isinstance(factor, dict) and "value" in factor:
+                props[key] = factor["value"]
+                props[f"{key}_basis"] = factor["basis"]
+            else:
+                props[key] = factor
 
         update = update_log.get(pid, {})
         props["최신업데이트일"] = update.get("date", "")

@@ -46,6 +46,9 @@ export interface PlanProperties {
 
   A_stage_progress: number;
   A_stage_progress_basis: string;
+  // 순위표 "진척도" 열(단계 타일)이 쓰는 값 — 사업유형별 전체 단계 수 중 현재 몇 번째인지.
+  A_stage_index: number;
+  A_stage_total: number;
   B_pretest: number;
   B_pretest_basis: string;
   C_delay: number;
