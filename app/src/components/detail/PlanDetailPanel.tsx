@@ -2,6 +2,7 @@ import type { PlanFeature } from "../../lib/types";
 import { computeScore, computeGrade, computeInvestmentHorizon } from "../../lib/computeScore";
 import { naverSearchUrl } from "../../lib/naverSearchLink";
 import { useRankingStore } from "../../store/rankingStore";
+import { useBoundaryStore } from "../../store/boundaryStore";
 import "./PlanDetailPanel.css";
 
 const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanFeature["properties"]; label: string }[] = [
@@ -15,6 +16,14 @@ const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanF
 
 export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   const weights = useRankingStore((s) => s.weights);
+  const boundaries = useBoundaryStore((s) => s.boundaries);
+  const drawingPlanId = useBoundaryStore((s) => s.drawingPlanId);
+  const draftPoints = useBoundaryStore((s) => s.draftPoints);
+  const startDrawing = useBoundaryStore((s) => s.startDrawing);
+  const undoLastPoint = useBoundaryStore((s) => s.undoLastPoint);
+  const finishDrawing = useBoundaryStore((s) => s.finishDrawing);
+  const cancelDrawing = useBoundaryStore((s) => s.cancelDrawing);
+  const clearBoundary = useBoundaryStore((s) => s.clearBoundary);
 
   if (!feature) {
     return (
@@ -39,6 +48,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         종합점수 {score.toFixed(1)} <span className="plan-detail__grade">{grade}</span>
         <span className="plan-detail__horizon">{horizon} 투자 후보</span>
       </div>
+      <div className="plan-detail__completion">예상완공시기: {p.예상완공시기}</div>
 
       <table className="plan-detail__factors">
         <tbody>
@@ -78,6 +88,37 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           </dl>
         </div>
       )}
+
+      <div className="plan-detail__boundary">
+        {drawingPlanId === p.id ? (
+          <>
+            <p className="plan-detail__dev-stats-hint">
+              지도를 클릭해 구역 경계를 순서대로 찍어주세요 ({draftPoints.length}개 점,
+              완료하려면 3개 이상 필요). 지적도가 아니라 눈대중으로 그리는 참고용 경계입니다.
+            </p>
+            <div className="plan-detail__boundary-actions">
+              <button onClick={undoLastPoint} disabled={draftPoints.length === 0}>
+                마지막 점 취소
+              </button>
+              <button onClick={finishDrawing} disabled={draftPoints.length < 3}>
+                완료
+              </button>
+              <button onClick={cancelDrawing}>그리기 취소</button>
+            </div>
+          </>
+        ) : boundaries[p.id] ? (
+          <div className="plan-detail__boundary-actions">
+            <span>구역 경계: 직접 그린 경계 있음 ({boundaries[p.id].length}개 점)</span>
+            <button onClick={() => startDrawing(p.id)}>다시 그리기</button>
+            <button onClick={() => clearBoundary(p.id)}>삭제</button>
+          </div>
+        ) : (
+          <div className="plan-detail__boundary-actions">
+            <span>구역 경계: 아직 없음(지도에 점만 표시 중)</span>
+            <button onClick={() => startDrawing(p.id)}>경계 그리기</button>
+          </div>
+        )}
+      </div>
 
       <dl className="plan-detail__fields">
         <dt>대략가격대</dt>

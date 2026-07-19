@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { PlanFeature } from "../../lib/types";
 import { rankPlans } from "../../lib/computeScore";
 import { useRankingStore } from "../../store/rankingStore";
+import { useBoundaryStore } from "../../store/boundaryStore";
 import { loadKakaoMaps } from "../../lib/kakaoMapLoader";
 import "./MapView.css";
 
@@ -22,14 +23,25 @@ export function MapView({ features }: { features: PlanFeature[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<KakaoMap | null>(null);
   const overlaysRef = useRef<KakaoCustomOverlay[]>([]);
+  const boundaryPolygonsRef = useRef<KakaoPolygon[]>([]);
+  const draftPolygonRef = useRef<KakaoPolygon | null>(null);
   const weights = useRankingStore((s) => s.weights);
   const selectedId = useRankingStore((s) => s.selectedId);
   const selectPlan = useRankingStore((s) => s.selectPlan);
+  const boundaries = useBoundaryStore((s) => s.boundaries);
+  const drawingPlanId = useBoundaryStore((s) => s.drawingPlanId);
+  const draftPoints = useBoundaryStore((s) => s.draftPoints);
+  const addDraftPoint = useBoundaryStore((s) => s.addDraftPoint);
 
   const scoredById = useMemo(() => {
     const ranked = rankPlans(features, weights);
     return new Map(ranked.map((sp) => [sp.feature.properties.id, sp]));
   }, [features, weights]);
+
+  const colorById = useMemo(
+    () => new Map(features.map((f) => [f.properties.id, f.properties.color])),
+    [features]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -45,6 +57,7 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     };
   }, []);
 
+  // 사업 마커
   useEffect(() => {
     let cancelled = false;
     loadKakaoMaps().then(() => {
@@ -83,15 +96,93 @@ export function MapView({ features }: { features: PlanFeature[] }) {
     };
   }, [features, scoredById, selectedId, selectPlan]);
 
+  // 사용자가 직접 그린 구역 경계(폴리곤) — 카카오 지도 API가 지적도를 안 줘서
+  // 대신 이 앱 안에서 손으로 그린 경계를 씀 (CLAUDE.md, store/boundaryStore.ts 참고)
   useEffect(() => {
-    if (!selectedId || !mapRef.current) return;
+    let cancelled = false;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current) return;
+      const map = mapRef.current;
+
+      boundaryPolygonsRef.current.forEach((poly) => poly.setMap(null));
+      boundaryPolygonsRef.current = Object.entries(boundaries)
+        .filter(([planId]) => planId !== drawingPlanId) // 그리는 중인 건 draft로 따로 렌더
+        .map(([planId, points]) => {
+          const color = colorById.get(planId) ?? "#6b7280";
+          const polygon = new kakao.maps.Polygon({
+            path: points.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
+            strokeWeight: 2,
+            strokeColor: color,
+            strokeOpacity: 0.9,
+            fillColor: color,
+            fillOpacity: 0.25,
+          });
+          polygon.setMap(map);
+          return polygon;
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [boundaries, colorById, drawingPlanId]);
+
+  // 그리는 중인 경계 미리보기
+  useEffect(() => {
+    let cancelled = false;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current) return;
+      draftPolygonRef.current?.setMap(null);
+      draftPolygonRef.current = null;
+      if (!drawingPlanId || draftPoints.length === 0) return;
+      const color = colorById.get(drawingPlanId) ?? "#2563eb";
+      const polygon = new kakao.maps.Polygon({
+        path: draftPoints.map((pt) => new kakao.maps.LatLng(pt.lat, pt.lng)),
+        strokeWeight: 2,
+        strokeColor: color,
+        strokeOpacity: 1,
+        fillColor: color,
+        fillOpacity: 0.35,
+      });
+      polygon.setMap(mapRef.current);
+      draftPolygonRef.current = polygon;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [drawingPlanId, draftPoints, colorById]);
+
+  // 그리기 모드일 때 지도 클릭 -> 점 추가
+  useEffect(() => {
+    if (!drawingPlanId) return;
+    let cancelled = false;
+    let handler: ((e: KakaoMouseEvent) => void) | null = null;
+    loadKakaoMaps().then(() => {
+      if (cancelled || !mapRef.current) return;
+      handler = (e) => addDraftPoint({ lat: e.latLng.getLat(), lng: e.latLng.getLng() });
+      kakao.maps.event.addListener(mapRef.current, "click", handler);
+    });
+    return () => {
+      cancelled = true;
+      if (handler && mapRef.current) {
+        kakao.maps.event.removeListener(mapRef.current, "click", handler);
+      }
+    };
+  }, [drawingPlanId, addDraftPoint]);
+
+  useEffect(() => {
+    if (!selectedId || !mapRef.current || drawingPlanId) return;
     const feature = features.find((f) => f.properties.id === selectedId);
     if (!feature) return;
     const [lng, lat] = feature.geometry.coordinates;
     const position = new kakao.maps.LatLng(lat, lng);
     mapRef.current.panTo(position);
     mapRef.current.setLevel(SELECTED_LEVEL);
-  }, [selectedId, features]);
+  }, [selectedId, features, drawingPlanId]);
 
-  return <div ref={containerRef} className="map-view" />;
+  return (
+    <div
+      ref={containerRef}
+      className={`map-view ${drawingPlanId ? "map-view--drawing" : ""}`}
+    />
+  );
 }

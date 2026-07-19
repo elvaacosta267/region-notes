@@ -35,6 +35,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
             <th>등급</th>
             <th>기간</th>
             <th>대략가격대</th>
+            <th>예상완공시기</th>
             <th></th>
           </tr>
         </thead>
@@ -64,6 +65,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 </td>
                 <td>{sp.investmentHorizon}</td>
                 <td>{p.대략가격대}</td>
+                <td className="ranking-table__completion">{p.예상완공시기}</td>
                 <td className="ranking-table__links">
                   <a
                     href={naverSearchUrl(p.사업명)}
