@@ -5,8 +5,10 @@ import { persist } from "zustand/middleware";
 // 카카오맵 무료 API가 지적도 폴리곤을 안 주기 때문에(CLAUDE.md 참고) 사용자가
 // 손으로 그린 경계를 대신 쓴다. 이 앱은 정적 사이트(백엔드 없음)라 브라우저
 // localStorage에만 저장된다 — 기기를 바꾸면 사라지므로, WeightPanel 옆 "경계
-// 내보내기" 버튼으로 JSON을 복사해 Claude에게 전달하면 geo/plan_boundaries.geojson
-// 에 영구 반영할 수 있다(README 업데이트 루프와 동일한 패턴).
+// 내보내기" 버튼으로 JSON을 복사해 다른 기기의 "가져오기"(importBoundaries)에
+// 붙여넣으면 그 자리에서 바로 반영된다. 영구 백업이 필요하면 같은 JSON을
+// Claude에게 줘서 geo/plan_boundaries.geojson에 커밋할 수도 있다(README 업데이트
+// 루프와 동일한 패턴, 선택 사항 — CLAUDE.md 참고).
 export type LatLng = { lat: number; lng: number };
 
 interface BoundaryState {
