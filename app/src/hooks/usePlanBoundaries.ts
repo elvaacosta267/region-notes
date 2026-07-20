@@ -1,0 +1,42 @@
+import { useQuery } from "@tanstack/react-query";
+import type { LatLng } from "../store/boundaryStore";
+
+// geo/plan_boundaries.geojson — 사용자가 지도에서 손으로 그린 뒤 BoundaryExport로
+// 내보낸 JSON을 Claude가 저장소에 커밋한 "공유 기준" 경계. store/boundaryStore.ts의
+// localStorage 값은 그린 기기의 브라우저에만 남기 때문에(백엔드 없는 정적 사이트),
+// 다른 기기(예: 모바일)에서 열면 경계가 안 보이고 plans.csv의 근사 좌표 마커만
+// 보이는 문제가 있었다 — 이 파일이 커밋되어 있으면 배포된 사이트를 어떤 기기에서
+// 열어도 동일한 경계가 보인다. MapView.tsx에서 이 값과 localStorage 값을 병합할 때
+// localStorage(이 기기에서 그리는 중/수정 중인 것)가 우선한다.
+interface PlanBoundaryFeature {
+  type: "Feature";
+  properties: { id: string };
+  geometry: { type: "Polygon"; coordinates: number[][][] };
+}
+
+interface PlanBoundaryGeoJSON {
+  type: "FeatureCollection";
+  features: PlanBoundaryFeature[];
+}
+
+async function fetchPlanBoundaries(): Promise<Record<string, LatLng[]>> {
+  const res = await fetch(`${import.meta.env.BASE_URL}data/plan_boundaries.geojson`);
+  if (!res.ok) return {}; // 아직 커밋된 경계가 없어도 지도는 정상 동작해야 함
+  const geojson: PlanBoundaryGeoJSON = await res.json();
+  const result: Record<string, LatLng[]> = {};
+  for (const feature of geojson.features) {
+    result[feature.properties.id] = feature.geometry.coordinates[0].map(([lng, lat]) => ({
+      lat,
+      lng,
+    }));
+  }
+  return result;
+}
+
+export function usePlanBoundaries() {
+  return useQuery({
+    queryKey: ["plan-boundaries"],
+    queryFn: fetchPlanBoundaries,
+    staleTime: Infinity,
+  });
+}

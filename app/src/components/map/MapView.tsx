@@ -34,9 +34,11 @@ function averageCenter(points: LatLng[]): LatLng {
 export function MapView({
   features,
   adminBoundary,
+  committedBoundaries,
 }: {
   features: PlanFeature[];
   adminBoundary: AdminBoundaryGeoJSON | null | undefined; // undefined = 아직 로딩 중
+  committedBoundaries: Record<string, LatLng[]> | undefined; // geo/plan_boundaries.geojson — 모든 기기 공통
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<KakaoMap | null>(null);
@@ -57,6 +59,15 @@ export function MapView({
   const addDraftPoint = useBoundaryStore((s) => s.addDraftPoint);
   const updateDraftPoint = useBoundaryStore((s) => s.updateDraftPoint);
   const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
+
+  // geo/plan_boundaries.geojson(모든 기기 공통, git 커밋됨)을 기본값으로 깔고, 이
+  // 기기의 localStorage(boundaries — 그리는 중/막 수정한 것)가 있으면 그것으로
+  // 덮어쓴다. 이렇게 해야 PC에서 그린 경계가 모바일 등 다른 기기에서도 보이면서도,
+  // 지금 이 기기에서 수정 중인 내용은 새로고침 전에도 즉시 반영된다.
+  const effectiveBoundaries = useMemo(
+    () => ({ ...committedBoundaries, ...boundaries }),
+    [committedBoundaries, boundaries]
+  );
 
   const scoredById = useMemo(() => {
     const ranked = rankPlans(features, weights);
@@ -185,7 +196,8 @@ export function MapView({
       overlaysRef.current = features
         .filter(
           (feature) =>
-            feature.properties.id !== drawingPlanId && !boundaries[feature.properties.id]
+            feature.properties.id !== drawingPlanId &&
+            !effectiveBoundaries[feature.properties.id]
         )
         .map((feature) => {
           const p = feature.properties;
@@ -216,7 +228,7 @@ export function MapView({
     return () => {
       cancelled = true;
     };
-  }, [features, scoredById, selectedId, selectPlan, boundaries, drawingPlanId, nameById]);
+  }, [features, scoredById, selectedId, selectPlan, effectiveBoundaries, drawingPlanId, nameById]);
 
   // 사용자가 직접 그린 구역 경계(폴리곤) — 카카오 지도 API가 지적도를 안 줘서
   // 대신 이 앱 안에서 손으로 그린 경계를 씀 (CLAUDE.md, store/boundaryStore.ts 참고).
@@ -233,7 +245,7 @@ export function MapView({
       boundaryPolygonsRef.current.forEach((poly) => poly.setMap(null));
       boundaryLabelsRef.current.forEach((label) => label.setMap(null));
 
-      const entries = Object.entries(boundaries).filter(
+      const entries = Object.entries(effectiveBoundaries).filter(
         ([planId]) => planId !== drawingPlanId // 그리는 중인 건 draft로 따로 렌더
       );
 
@@ -272,7 +284,7 @@ export function MapView({
     return () => {
       cancelled = true;
     };
-  }, [boundaries, colorById, nameById, drawingPlanId, selectedId, selectPlan]);
+  }, [effectiveBoundaries, colorById, nameById, drawingPlanId, selectedId, selectPlan]);
 
   // 그리는 중인 경계 미리보기
   useEffect(() => {
@@ -365,7 +377,7 @@ export function MapView({
   // plans.csv의 동단위 근사 좌표보다 우선한다.
   useEffect(() => {
     if (!selectedId || !mapRef.current || drawingPlanId) return;
-    const boundary = boundaries[selectedId];
+    const boundary = effectiveBoundaries[selectedId];
     if (boundary && boundary.length > 0) {
       const bounds = new kakao.maps.LatLngBounds();
       boundary.forEach((pt) => bounds.extend(new kakao.maps.LatLng(pt.lat, pt.lng)));
@@ -378,7 +390,7 @@ export function MapView({
     const position = new kakao.maps.LatLng(lat, lng);
     mapRef.current.panTo(position);
     mapRef.current.setLevel(SELECTED_LEVEL);
-  }, [selectedId, features, drawingPlanId, boundaries]);
+  }, [selectedId, features, drawingPlanId, effectiveBoundaries]);
 
   return (
     <div
