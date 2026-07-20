@@ -15,6 +15,15 @@
     overflow-x: auto;
     overflow-y: visible;
   }
+
+  /* App.css의 .app__map이 이제 position: sticky; top: 0으로 화면 위에 고정되므로,
+     표 헤더가 그 자리(top: 0)에 그대로 sticky하면 지도 아래로 숨어버린다 —
+     지도 높이(280px)만큼 내려서 지도 바로 아래에 붙게 하고, z-index도 지도보다
+     낮춰(App.css의 .app__map은 20) 스크롤 시 지도가 항상 위에 오게 한다. */
+  .ranking-table th {
+    top: 280px;
+    z-index: 10;
+  }
 }
 
 .ranking-table__count {

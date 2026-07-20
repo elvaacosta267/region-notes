@@ -21,6 +21,7 @@ function App() {
   const { data: committedBoundaries } = usePlanBoundaries();
   const selectedId = useRankingStore((s) => s.selectedId);
   const [mapExpanded, setMapExpanded] = useState(false);
+  const [syncToolsOpen, setSyncToolsOpen] = useState(false);
   const { readOnly } = useViewOnlyMode();
   useFirestoreSync();
 
@@ -77,11 +78,24 @@ function App() {
               수정할 수 없습니다
             </div>
           ) : (
-            <>
-              <SyncSetup />
-              <LocalDataExport />
-              <LocalDataImport />
-            </>
+            <div className="app__sync-tools">
+              <button
+                type="button"
+                className="app__sync-tools-toggle"
+                onClick={() => setSyncToolsOpen((v) => !v)}
+              >
+                {syncToolsOpen ? "▾" : "▸"} 기기간 동기화·백업 설정
+              </button>
+              <div
+                className={`app__sync-tools-body ${
+                  syncToolsOpen ? "app__sync-tools-body--open" : ""
+                }`}
+              >
+                <SyncSetup />
+                <LocalDataExport />
+                <LocalDataImport />
+              </div>
+            </div>
           )}
           <RankingTable features={features} />
         </div>
