@@ -115,8 +115,49 @@
 }
 
 @media (max-width: 900px) {
+  /* 모바일에서는 데스크톱처럼 "100vh 안에 순위표+지도+상세패널을 각각 내부
+     스크롤 영역으로 욱여넣는" 방식이 안 맞는다 — app__right의 지도/상세패널
+     min-height 합(약 380px)이 남은 공간을 다 잡아먹어서 정작 주 UI인
+     순위표(RankingTable.tsx, "primary UI, not the map" — CLAUDE.md 참고)가
+     한두 줄만 보이는 문제가 있었다. 페이지 전체를 자연스럽게 스크롤하는
+     방식으로 바꾸고(app을 100vh에 고정하지 않음), 순위표는 자기 높이만큼
+     펼쳐지게 해서 스크롤 없이도 여러 행이 한눈에 들어오게 한다. */
+  .app {
+    height: auto;
+    min-height: 100vh;
+  }
+
   .app__body {
     flex-direction: column;
+    overflow: visible;
+  }
+
+  .app__left,
+  .app__right {
+    flex: none;
+    min-width: 0;
+  }
+
+  /* min-height가 아니라 height여야 한다 — app__right가 더 이상 flex로 늘어나지
+     않으므로(위 flex: none) 자식들의 높이가 콘텐츠 기반(auto)이 되는데,
+     MapView.css의 .map-view는 height: 100%로 부모 높이를 그대로 물려받는
+     방식이라 부모가 "정해진 높이"가 아니면(min-height만으로는 부족) 0으로
+     계산돼 카카오맵이 빈 화면으로 보이는 문제가 있었다. flex도 같이 꺼야
+     한다 — app__map의 원래 flex: 1.2 1 0%(flex-basis: 0%)가 남아있으면
+     "채울 여백 없는" 콘텐츠 기반 flex 컨테이너 안에서는 명시적 height보다
+     flex-basis가 우선 적용돼 결국 min-height(220px)로 주저앉는다. */
+  .app__map {
+    flex: none;
+    height: 280px;
+  }
+
+  /* app__map과 같은 이유로 flex를 꺼둔다 — PlanDetailPanel.css의 .plan-detail이
+     실제 텍스트 콘텐츠라 지도처럼 완전히 안 보이는 문제는 없지만, min-height만
+     남기고 flex-basis(0%)가 이상하게 눌러버리는 걸 방지해 안전하게 콘텐츠
+     높이만큼 자연스럽게 펼쳐지게 한다. */
+  .app__detail {
+    flex: none;
+    min-height: 160px;
   }
 }
 

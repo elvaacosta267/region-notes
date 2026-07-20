@@ -3,6 +3,20 @@
   height: 100%;
 }
 
+@media (max-width: 900px) {
+  /* App.css의 모바일 레이아웃 변경과 짝 — 세로는 내부 스크롤 영역 대신 표
+     전체가 페이지 흐름을 따라 펼쳐지게 한다(th의 sticky는 그대로 동작, 스크롤
+     기준이 이 wrap 내부가 아니라 페이지 전체로 바뀔 뿐). 가로는 그대로
+     overflow-x: auto로 남겨둔다 — 컬럼이 많아 여전히 뷰포트보다 넓은데, 여기서
+     overflow를 완전히 visible로 풀면 표를 가로로 볼 방법이 없어져 버린다.
+     페이지 자체는 가로로 안 늘어나게 이 wrap 안에서만 가로 스크롤을 허용. */
+  .ranking-table__wrap {
+    height: auto;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+}
+
 .ranking-table__count {
   font-size: 12px;
   opacity: 0.7;
