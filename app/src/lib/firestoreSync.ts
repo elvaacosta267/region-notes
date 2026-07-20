@@ -37,7 +37,13 @@ function pushLocalToFirestore(syncId: string) {
   }, 400);
 }
 
-export function startFirestoreSync(syncId: string): () => void {
+// readOnly: true(hooks/useViewOnlyMode.ts로 진입한 "보기 전용 링크")면 원격 값을
+// 받아서 로컬에 반영만 하고, 이 기기의 어떤 변화도 Firestore에 쓰지 않는다 — 문서가
+// 아직 없을 때의 "초기값 올리기"도 쓰기이므로 건너뛴다. UI 쪽에서도 편집 컨트롤을
+// 숨기지만(각 컴포넌트의 useViewOnlyMode 체크), 여기서도 한 번 더 막아 이중으로
+// 안전하게 한다.
+export function startFirestoreSync(syncId: string, options: { readOnly?: boolean } = {}): () => void {
+  const readOnly = options.readOnly ?? false;
   const db = getFirestore(firebaseApp);
   const ref = doc(db, "syncs", syncId, "state", "data");
 
@@ -45,8 +51,7 @@ export function startFirestoreSync(syncId: string): () => void {
     ref,
     (snap) => {
       if (!snap.exists()) {
-        // 이 코드로 처음 연결하는 것 — 이 기기의 현재 상태를 초기값으로 올린다.
-        pushLocalToFirestore(syncId);
+        if (!readOnly) pushLocalToFirestore(syncId); // 이 코드로 처음 연결 — 초기값으로 올림
         return;
       }
       const data = snap.data();
@@ -63,6 +68,10 @@ export function startFirestoreSync(syncId: string): () => void {
       console.error("실시간 동기화 수신 실패:", err);
     }
   );
+
+  if (readOnly) {
+    return () => unsubscribeSnapshot();
+  }
 
   // boundaryStore는 drawingPlanId/draftPoints(그리는 중 임시 상태)도 같은 store에
   // 있어 매 꼭짓점 클릭마다 알림이 오는데, 그건 아직 boundaries에 반영 전이라 굳이

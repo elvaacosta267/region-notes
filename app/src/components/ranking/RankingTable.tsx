@@ -8,6 +8,7 @@ import { priceShortLabel } from "../../lib/priceShortLabel";
 import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
+import { useViewOnlyMode } from "../../hooks/useViewOnlyMode";
 import "./RankingTable.css";
 
 const GRADE_CLASS: Record<string, string> = {
@@ -51,6 +52,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
   const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
   const setNameOverride = usePlanOverrideStore((s) => s.setNameOverride);
   const clearNameOverride = usePlanOverrideStore((s) => s.clearNameOverride);
+  const { readOnly } = useViewOnlyMode();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
 
@@ -111,7 +113,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 <td className="ranking-table__name">
                   <span className="ranking-table__name-row">
                     <span className="ranking-table__dot" style={{ background: p.color }} />
-                    {editingId === p.id ? (
+                    {editingId === p.id && !readOnly ? (
                       <input
                         className="ranking-table__name-input"
                         value={nameDraft}
@@ -127,19 +129,21 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                     ) : (
                       <>
                         <span title={name}>{planShortDisplayName(name)}</span>
-                        <button
-                          type="button"
-                          className="ranking-table__name-edit"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setNameDraft(name);
-                            setEditingId(p.id);
-                          }}
-                          title="이름 수정"
-                          aria-label="이름 수정"
-                        >
-                          ✏️
-                        </button>
+                        {!readOnly && (
+                          <button
+                            type="button"
+                            className="ranking-table__name-edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setNameDraft(name);
+                              setEditingId(p.id);
+                            }}
+                            title="이름 수정"
+                            aria-label="이름 수정"
+                          >
+                            ✏️
+                          </button>
+                        )}
                       </>
                     )}
                     {hasRecentUpdate && (
