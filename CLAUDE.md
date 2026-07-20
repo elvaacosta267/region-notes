@@ -89,6 +89,27 @@ internal dong-to-dong lines also visible. Re-run only if the source repo's admin
 change (rare) or a newer `verYYYYMMDD` directory should be used instead of the hardcoded
 `SOURCE_URL`.
 
+### Recurring boundary import (`tools/import_plan_boundaries.py`) — the 경계 업데이트 루프
+```bash
+python3 tools/import_plan_boundaries.py <exported.json>   # merges into geo/plan_boundaries.geojson
+cd app && npm run sync-data                                # copies it into app/public/data/
+```
+Unlike the one-off scripts above, this one recurs: the user's workflow is PC-only drawing
+(`store/boundaryStore.ts`'s click-to-add-vertex mode) followed by periodically handing Claude the
+"직접 그린 경계 내보내기" JSON so it gets committed — same **git-as-database** pattern this whole
+repo already uses for `db/plans.csv` (see README's 업데이트 루프), just for boundary geometry
+instead of CSV rows. This script exists specifically so that repeated hand-offs don't mean
+re-deriving the merge logic (or risking a manual-transcription mistake) each time as the tracked
+area grows past 부평구 toward the full 수도권: it takes the exported
+`{"planId": [{"lat":..,"lng":..}, ...], ...}` JSON (always the *entire* current localStorage
+export, not a diff) and **upserts** by plan id into whatever's already in
+`geo/plan_boundaries.geojson`, so ids from earlier sessions/regions are never dropped just because
+a later export didn't happen to include them. Skips (with a stderr warning, not a crash) any
+plan with fewer than 3 points — not a valid polygon yet. Closes the GeoJSON ring (first point
+repeated as last) per RFC 7946; `app/src/hooks/usePlanBoundaries.ts` strips that duplicate back
+out when reading, since the app's internal `LatLng[]` representation (matching
+`kakao.maps.Polygon`'s `path`) is an open vertex list, not a closed ring.
+
 ### React app (`app/`)
 ```bash
 cd app
@@ -246,9 +267,10 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   `effectiveBoundaries`, which every rendering/fit-bounds effect uses instead of the raw store
   value. Net effect: the committed file is the baseline every device sees, and whichever device is
   actively mid-edit on a given plan sees its own in-progress localStorage version until it's
-  exported and committed. Update this file the same way as any other geo/*.geojson — via the
-  BoundaryExport JSON handed to Claude — then `npm run sync-data` (wired into `sync-data.mjs` as an
-  optional file, like `bupyeong_boundary.geojson`) copies it into `app/public/data/`.
+  exported and committed. Update this file via `tools/import_plan_boundaries.py` (see Commands
+  section — takes the BoundaryExport JSON, upserts by plan id, never overwrites the whole file)
+  then `npm run sync-data` (wired into `sync-data.mjs` as an optional file, like
+  `bupyeong_boundary.geojson`) copies it into `app/public/data/`.
 - `hooks/useBupyeongBoundary.ts` fetches `geo/bupyeong_boundary.geojson` (real 부평구 행정동
   boundaries, see `tools/fetch_bupyeong_boundary.py` above) and `MapView.tsx` renders it as a
   thin gray dashed `kakao.maps.Polygon` per 행정동 — non-interactive background context, styled
