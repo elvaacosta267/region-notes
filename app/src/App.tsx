@@ -9,6 +9,7 @@ import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
 import { BoundaryExport } from "./components/filters/BoundaryExport";
+import { BoundaryImport } from "./components/filters/BoundaryImport";
 import "./App.css";
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
         <div className="app__left">
           <WeightPanel />
           <BoundaryExport />
+          <BoundaryImport />
           <RankingTable features={features} />
         </div>
         <div className="app__right">

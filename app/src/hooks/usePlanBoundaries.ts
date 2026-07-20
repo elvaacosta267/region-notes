@@ -25,10 +25,16 @@ async function fetchPlanBoundaries(): Promise<Record<string, LatLng[]>> {
   const geojson: PlanBoundaryGeoJSON = await res.json();
   const result: Record<string, LatLng[]> = {};
   for (const feature of geojson.features) {
-    result[feature.properties.id] = feature.geometry.coordinates[0].map(([lng, lat]) => ({
-      lat,
-      lng,
-    }));
+    const ring = feature.geometry.coordinates[0];
+    // GeoJSON 폴리곤 스펙(RFC 7946)은 첫 점=마지막 점으로 닫힌 링을 요구하지만,
+    // 이 앱 내부에서 쓰는 LatLng[]는 (kakao.maps.Polygon처럼) 닫히지 않은 꼭짓점
+    // 목록이라 마지막 중복점은 제거한다 — 그대로 두면 지도에 불필요한 꼭짓점이
+    // 하나 더 찍힌다(육안으로는 티 안 나지만 draftPoints 개수 등이 어긋남).
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+    const isClosed = ring.length > 1 && first[0] === last[0] && first[1] === last[1];
+    const points = isClosed ? ring.slice(0, -1) : ring;
+    result[feature.properties.id] = points.map(([lng, lat]) => ({ lat, lng }));
   }
   return result;
 }
