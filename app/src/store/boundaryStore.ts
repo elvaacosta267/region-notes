@@ -20,6 +20,7 @@ interface BoundaryState {
   finishDrawing: () => void;
   cancelDrawing: () => void;
   clearBoundary: (planId: string) => void;
+  importBoundaries: (data: Record<string, LatLng[]>) => void;
 }
 
 export const useBoundaryStore = create<BoundaryState>()(
@@ -62,6 +63,19 @@ export const useBoundaryStore = create<BoundaryState>()(
           const next = { ...state.boundaries };
           delete next[planId];
           return { boundaries: next };
+        }),
+
+      // 다른 기기(주로 PC)에서 "경계 내보내기"로 복사한 JSON을 이 기기에 즉시
+      // 반영한다 — git 커밋/배포를 기다릴 필요 없는 PC↔모바일 당일 동기화 경로.
+      // upsert이므로 이 기기에 이미 있던 다른 plan id의 경계는 그대로 남는다.
+      // 3점 미만은 유효한 폴리곤이 아니라서 조용히 걸러낸다(tools/import_plan_boundaries.py
+      // 의 동일 규칙과 맞춤).
+      importBoundaries: (data) =>
+        set((state) => {
+          const valid = Object.fromEntries(
+            Object.entries(data).filter(([, points]) => points.length >= 3)
+          );
+          return { boundaries: { ...state.boundaries, ...valid } };
         }),
     }),
     {
