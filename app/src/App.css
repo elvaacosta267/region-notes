@@ -121,10 +121,23 @@
      순위표(RankingTable.tsx, "primary UI, not the map" — CLAUDE.md 참고)가
      한두 줄만 보이는 문제가 있었다. 페이지 전체를 자연스럽게 스크롤하는
      방식으로 바꾸고(app을 100vh에 고정하지 않음), 순위표는 자기 높이만큼
-     펼쳐지게 해서 스크롤 없이도 여러 행이 한눈에 들어오게 한다. */
+     펼쳐지게 해서 스크롤 없이도 여러 행이 한눈에 들어온다. */
   .app {
     height: auto;
     min-height: 100vh;
+  }
+
+  /* 소개문/가중치조절/동기화설정 등 부가 UI는 화면을 좁은 모바일에서 스크롤을
+     길게 만들기만 할 뿐이라 전부 숨긴다 — "지도 위, 목록 아래"만 바로 보이게. */
+  .app__subtitle,
+  .app__context-note,
+  .weight-panel,
+  .sync-setup,
+  .local-data-export,
+  .local-data-import,
+  .local-data-import__toggle,
+  .app__view-only-badge {
+    display: none;
   }
 
   .app__body {
@@ -132,14 +145,21 @@
     overflow: visible;
   }
 
-  .app__left,
-  .app__right {
+  .app__left {
     flex: none;
     min-width: 0;
   }
 
-  /* min-height가 아니라 height여야 한다 — app__right가 더 이상 flex로 늘어나지
-     않으므로(위 flex: none) 자식들의 높이가 콘텐츠 기반(auto)이 되는데,
+  /* app__right는 지도+상세패널을 함께 담는 래퍼일 뿐이라, display: contents로
+     껍데기를 없애 지도(app__map)와 상세패널(app__detail)이 app__body의
+     직속 flex 자식이 되게 한다 — 그래야 아래 order로 "지도 → 목록(app__left)
+     → 상세패널" 순서를 만들 수 있다(같은 부모의 형제 사이에서만 order가 먹힘). */
+  .app__right {
+    display: contents;
+  }
+
+  /* min-height가 아니라 height여야 한다 — app__map이 더 이상 flex로 늘어나지
+     않으므로(아래 flex: none) 높이가 콘텐츠 기반(auto)이 되는데,
      MapView.css의 .map-view는 height: 100%로 부모 높이를 그대로 물려받는
      방식이라 부모가 "정해진 높이"가 아니면(min-height만으로는 부족) 0으로
      계산돼 카카오맵이 빈 화면으로 보이는 문제가 있었다. flex도 같이 꺼야
@@ -149,15 +169,22 @@
   .app__map {
     flex: none;
     height: 280px;
+    order: 1;
+  }
+
+  .app__left {
+    order: 2;
   }
 
   /* app__map과 같은 이유로 flex를 꺼둔다 — PlanDetailPanel.css의 .plan-detail이
      실제 텍스트 콘텐츠라 지도처럼 완전히 안 보이는 문제는 없지만, min-height만
      남기고 flex-basis(0%)가 이상하게 눌러버리는 걸 방지해 안전하게 콘텐츠
-     높이만큼 자연스럽게 펼쳐지게 한다. */
+     높이만큼 자연스럽게 펼쳐지게 한다. 목록에서 사업을 고르면 그 아래(순서상
+     마지막)에 상세 근거가 나타난다. */
   .app__detail {
     flex: none;
     min-height: 160px;
+    order: 3;
   }
 }
 
