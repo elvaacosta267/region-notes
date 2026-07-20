@@ -232,9 +232,23 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   Since this is a static site with no backend, a drawn boundary never leaves the browser it was
   drawn in; `components/filters/BoundaryExport.tsx` serializes all boundaries to JSON (clipboard,
   with a `<textarea>` fallback for when `navigator.clipboard` is blocked) so a user can hand that
-  JSON to Claude in a future session to commit permanently (e.g. into a new
-  `geo/plan_boundaries.geojson`) — same pattern as the README's 업데이트 루프, just for geometry
-  instead of CSV rows.
+  JSON to Claude in a future session to commit permanently into `geo/plan_boundaries.geojson` —
+  same pattern as the README's 업데이트 루프, just for geometry instead of CSV rows.
+- `geo/plan_boundaries.geojson` + `hooks/usePlanBoundaries.ts` — the committed, cross-device
+  counterpart to the localStorage-only boundaries above. This exists because a boundary drawn on
+  one phone/browser used to be invisible everywhere else (including other devices of the same
+  person) — opening the app on a second device showed the plain round marker at `plans.csv`'s
+  dong-level-approximate coordinate instead of the hand-traced polygon, which reads as "the zone
+  is in the wrong place." `usePlanBoundaries()` fetches this file the same way
+  `useBupyeongBoundary.ts` does (react-query, `staleTime: Infinity`, 404 tolerated as "not created
+  yet") and `MapView.tsx` merges it with the live `boundaryStore` value
+  (`{ ...committedBoundaries, ...boundaries }`, local store wins per plan id) into
+  `effectiveBoundaries`, which every rendering/fit-bounds effect uses instead of the raw store
+  value. Net effect: the committed file is the baseline every device sees, and whichever device is
+  actively mid-edit on a given plan sees its own in-progress localStorage version until it's
+  exported and committed. Update this file the same way as any other geo/*.geojson — via the
+  BoundaryExport JSON handed to Claude — then `npm run sync-data` (wired into `sync-data.mjs` as an
+  optional file, like `bupyeong_boundary.geojson`) copies it into `app/public/data/`.
 - `hooks/useBupyeongBoundary.ts` fetches `geo/bupyeong_boundary.geojson` (real 부평구 행정동
   boundaries, see `tools/fetch_bupyeong_boundary.py` above) and `MapView.tsx` renders it as a
   thin gray dashed `kakao.maps.Polygon` per 행정동 — non-interactive background context, styled

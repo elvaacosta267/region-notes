@@ -13,6 +13,7 @@ const DEST_DIR = join(APP_ROOT, "public", "data");
 const FILES = [
   { src: join(REPO_ROOT, "geo", "plans.geojson"), required: true },
   { src: join(REPO_ROOT, "geo", "bupyeong_boundary.geojson"), required: false },
+  { src: join(REPO_ROOT, "geo", "plan_boundaries.geojson"), required: false },
 ];
 
 mkdirSync(DEST_DIR, { recursive: true });
