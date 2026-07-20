@@ -8,8 +8,8 @@ import { MapView } from "./components/map/MapView";
 import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
-import { BoundaryExport } from "./components/filters/BoundaryExport";
-import { BoundaryImport } from "./components/filters/BoundaryImport";
+import { LocalDataExport } from "./components/filters/LocalDataExport";
+import { LocalDataImport } from "./components/filters/LocalDataImport";
 import "./App.css";
 
 function App() {
@@ -66,8 +66,8 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
-          <BoundaryExport />
-          <BoundaryImport />
+          <LocalDataExport />
+          <LocalDataImport />
           <RankingTable features={features} />
         </div>
         <div className="app__right">

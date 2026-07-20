@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { LatLng } from "../store/boundaryStore";
 
-// geo/plan_boundaries.geojson — 사용자가 지도에서 손으로 그린 뒤 BoundaryExport로
+// geo/plan_boundaries.geojson — 사용자가 지도에서 손으로 그린 뒤 LocalDataExport로
 // 내보낸 JSON을 Claude가 저장소에 커밋한 "공유 기준" 경계. store/boundaryStore.ts의
 // localStorage 값은 그린 기기의 브라우저에만 남기 때문에(백엔드 없는 정적 사이트),
 // 다른 기기(예: 모바일)에서 열면 경계가 안 보이고 plans.csv의 근사 좌표 마커만
