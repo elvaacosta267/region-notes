@@ -250,37 +250,57 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   taking over the marker's job. Persisted to `localStorage` only (`persist` middleware,
   `partialize`d to just `boundaries` — the in-progress `drawingPlanId`/`draftPoints` are
   deliberately *not* persisted, or a page reload would permanently strand the map in draw-mode).
-  Since this is a static site with no backend, a drawn boundary never leaves the browser it was
-  drawn in. The same is true of `store/planOverrideStore.ts` (사업명 수정 override, 메모, 관련
-  링크 — edited from `PlanDetailPanel.tsx`'s ✏️ button and memo/link fields). There are two
-  separate, complementary sync paths out of that single browser — pick based on how soon the data
-  needs to be visible elsewhere, not "which one is more correct":
-  - **Same-day, device-to-device** (e.g. "I just drew this on my PC, I want to see it on my phone
-    before I leave the house"): `components/filters/LocalDataExport.tsx` serializes *both* stores
-    — boundaries, name overrides, notes, and extra links — into one JSON blob (clipboard, with a
-    `<textarea>` fallback for when `navigator.clipboard` is blocked), and
-    `components/filters/LocalDataImport.tsx` (a paste-a-JSON-blob textarea gated behind a toggle
-    button, always rendered regardless of whether this device already has local data — it's the
-    only thing an empty-localStorage device has) calls `boundaryStore`'s `importBoundaries(data)`
-    and `planOverrideStore`'s `importOverrides(data)` to upsert that JSON straight into *this*
-    browser's localStorage, immediately, with no git/deploy round-trip and no Claude involvement.
-    (It also still parses the older boundaries-only flat export format for backward compat.) This
-    is the primary way a second device sees an edit the same day it was made — copy the button's
-    output (Apple's Universal Clipboard makes this a non-event between a Mac and an iPhone/iPad on
-    the same Apple ID) and paste it into the other device's Import box.
-  - **Permanent, cross-session baseline (boundaries only)**: hand that same exported JSON to
-    Claude to commit into `geo/plan_boundaries.geojson` (`tools/import_plan_boundaries.py`, see
-    Commands section — same upsert-by-plan-id semantics as `importBoundaries`, just persisted to
-    git instead of localStorage) — same pattern as the README's 업데이트 루프, just for geometry
-    instead of CSV rows. This matters for durability (a cleared cache/new browser profile doesn't
-    lose anything) and so a **brand-new device that has never received an Import paste** still
-    sees every previously-drawn boundary instead of a plain approximate-coordinate marker — the
-    git commit is the fallback of last resort, not the fast path. `planOverrideStore` data
+  On its own, this data never leaves the browser it was drawn in (same for
+  `store/planOverrideStore.ts` — 사업명 수정 override, 메모, 관련 링크, edited from
+  `PlanDetailPanel.tsx`'s ✏️ button and memo/link fields). There are three complementary sync
+  paths out of that single browser, in the order the app actually tries them:
+  - **Real-time, automatic (primary)**: `lib/firestoreSync.ts` + `hooks/useFirestoreSync.ts` +
+    `components/filters/SyncSetup.tsx`. Once the user generates or enters a shared "sync code" on
+    two or more devices (`store/syncStore.ts`, localStorage-only, never committed), every local
+    change to `boundaryStore` or `planOverrideStore` is pushed (debounced 400ms) to a single
+    Firestore document at `syncs/{syncId}/state/data`, and an `onSnapshot` listener applies
+    incoming remote changes back to both stores via their `replaceBoundaries`/`replaceOverrides`
+    actions (a full replace, not an upsert — unlike `importBoundaries`/`importOverrides` below,
+    this must propagate *deletions* too, or a boundary/note removed on one device would linger
+    forever on others). An `applyingRemote` module-level flag in `firestoreSync.ts` prevents the
+    obvious feedback loop (remote update → store change → re-push to Firestore). This exists
+    because manual export/import (below) turned out to be exactly the friction the user was
+    trying to avoid — "매번 내보내기 누르기 싫다" — and because the git-committed-baseline path
+    (`geo/plan_boundaries.geojson`) can only ever reflect whatever was last manually handed to
+    Claude, so newly-drawn zones on PC were routinely missing on mobile with no way to detect the
+    gap. Firebase's web config (`VITE_FIREBASE_*`) is public by the same logic as
+    `VITE_KAKAO_JS_KEY` above — safe to expose client-side, not a secret — so real access control
+    is the Firestore security rule instead: `allow get, write: if true; allow list: if false;`
+    scoped to `/syncs/{syncId}/state/{doc}`. Since this is a public repo, a *fixed* document path
+    baked into source would be visible to anyone reading the code or the built JS bundle, so the
+    path segment is a random 12-character code the user generates once and manually copies to
+    each device (`SyncSetup.tsx`'s "새 동기화 코드 만들기" / "코드 입력") — security through
+    the code being unguessable and `list` being disabled, not through obscuring the app's source.
+    This is meaningfully weaker than real authentication, so avoid anything highly sensitive in
+    `notes`. `VITE_FIREBASE_*` lives in `app/.env.local` locally and as GitHub Actions repo
+    variables in CI (`.github/workflows/deploy.yml`), same two-places pattern as the Kakao key.
+  - **Same-day, device-to-device, manual (fallback for users without a Firebase project)**:
+    `components/filters/LocalDataExport.tsx` serializes *both* stores — boundaries, name
+    overrides, notes, and extra links — into one JSON blob (clipboard, with a `<textarea>`
+    fallback for when `navigator.clipboard` is blocked), and `components/filters/LocalDataImport.tsx`
+    (a paste-a-JSON-blob textarea gated behind a toggle button) calls `boundaryStore`'s
+    `importBoundaries(data)` and `planOverrideStore`'s `importOverrides(data)` to *upsert* that
+    JSON into *this* browser's localStorage — no git/deploy round-trip, no Claude involvement, but
+    also no automatic deletion propagation and no automatic push (the user has to remember to
+    click both buttons). (It also still parses the older boundaries-only flat export format for
+    backward compat.)
+  - **Permanent, cross-session baseline (boundaries only)**: hand an exported JSON to Claude to
+    commit into `geo/plan_boundaries.geojson` (`tools/import_plan_boundaries.py`, see Commands
+    section — same upsert-by-plan-id semantics as `importBoundaries`, just persisted to git
+    instead of localStorage) — same pattern as the README's 업데이트 루프, just for geometry
+    instead of CSV rows. This matters for durability (a cleared cache/new browser profile, or a
+    device that's never been given the sync code, doesn't lose anything) — it's the fallback of
+    last resort now that real-time sync exists, not the fast path. `planOverrideStore` data
     deliberately has **no** git-committed equivalent: `notes` is a private, freeform investment
-    memo that must never end up in this public repo, and `nameOverrides`/`extraLinks` should
-    graduate to a real `db/plans.csv` edit (sourced) instead of a permanent side-channel once
-    confirmed — ask Claude to make that CSV edit directly rather than routing it through this
-    sync mechanism.
+    memo that must never end up in this public repo (Firestore is fine — it's not the git repo —
+    but git is not), and `nameOverrides`/`extraLinks` should graduate to a real `db/plans.csv`
+    edit (sourced) instead of a permanent side-channel once confirmed — ask Claude to make that
+    CSV edit directly rather than routing it through this sync mechanism.
 - `geo/plan_boundaries.geojson` + `hooks/usePlanBoundaries.ts` — the committed counterpart to the
   localStorage-only boundaries above (see previous bullet for why both exist). This exists because
   a boundary drawn on one phone/browser used to be invisible everywhere else (including other

@@ -2,6 +2,14 @@
 
 interface ImportMetaEnv {
   readonly VITE_KAKAO_JS_KEY: string;
+  // Firebase 웹 설정값 — Kakao JS 키와 마찬가지로 공개돼도 되는 값(비밀키 아님).
+  // 실제 접근 제어는 Firestore 보안 규칙이 담당한다 (lib/firebaseSync.ts 참고).
+  readonly VITE_FIREBASE_API_KEY: string;
+  readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  readonly VITE_FIREBASE_PROJECT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
+  readonly VITE_FIREBASE_APP_ID: string;
 }
 
 interface ImportMeta {

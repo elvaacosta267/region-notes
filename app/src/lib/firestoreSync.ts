@@ -1,0 +1,81 @@
+import { doc, getFirestore, onSnapshot, setDoc } from "firebase/firestore";
+import { firebaseApp } from "./firebase";
+import { useBoundaryStore } from "../store/boundaryStore";
+import { usePlanOverrideStore } from "../store/planOverrideStore";
+
+// PC에서 그린 경계/고친 사업명·메모·링크가 다른 기기에 버튼 없이 자동으로(수 초 내)
+// 반영되도록 하는 실시간 동기화 엔진. LocalDataExport/Import(수동 복사-붙여넣기)는
+// Firebase 프로젝트를 만들지 않은 사용자를 위한 대체 경로로 그대로 남겨둔다.
+//
+// 문서 하나(syncs/{syncId}/state/data)에 boundaryStore + planOverrideStore를 합쳐
+// 저장한다. 로컬 변경 -> Firestore로 write, Firestore 변경(다른 기기가 쓴 것) ->
+// 로컬 store로 apply, 두 방향을 동시에 구독하므로 무한루프를 막아야 한다:
+// applyingRemote 플래그를 원격 값을 로컬에 적용하는 그 순간만 true로 켜두고,
+// 로컬 변경 구독 콜백은 이 플래그가 true면 아무것도 안 한다(Zustand의 set()은
+// 구독자를 동기적으로 호출하므로 이 플래그로 정확히 구분된다).
+let applyingRemote = false;
+let writeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function pushLocalToFirestore(syncId: string) {
+  if (applyingRemote) return;
+  if (writeTimer) clearTimeout(writeTimer);
+  // 짧은 시간에 여러 필드가 연달아 바뀌는 경우(예: 경계를 여러 점 찍는 중)를
+  // 하나의 write로 묶기 위한 디바운스 — 매 클릭마다 네트워크 요청을 보내지 않는다.
+  writeTimer = setTimeout(() => {
+    const { boundaries } = useBoundaryStore.getState();
+    const { nameOverrides, notes, extraLinks } = usePlanOverrideStore.getState();
+    const db = getFirestore(firebaseApp);
+    setDoc(doc(db, "syncs", syncId, "state", "data"), {
+      boundaries,
+      nameOverrides,
+      notes,
+      extraLinks,
+      updatedAt: Date.now(),
+    }).catch((err) => {
+      console.error("실시간 동기화 저장 실패:", err);
+    });
+  }, 400);
+}
+
+export function startFirestoreSync(syncId: string): () => void {
+  const db = getFirestore(firebaseApp);
+  const ref = doc(db, "syncs", syncId, "state", "data");
+
+  const unsubscribeSnapshot = onSnapshot(
+    ref,
+    (snap) => {
+      if (!snap.exists()) {
+        // 이 코드로 처음 연결하는 것 — 이 기기의 현재 상태를 초기값으로 올린다.
+        pushLocalToFirestore(syncId);
+        return;
+      }
+      const data = snap.data();
+      applyingRemote = true;
+      useBoundaryStore.getState().replaceBoundaries(data.boundaries ?? {});
+      usePlanOverrideStore.getState().replaceOverrides({
+        nameOverrides: data.nameOverrides ?? {},
+        notes: data.notes ?? {},
+        extraLinks: data.extraLinks ?? {},
+      });
+      applyingRemote = false;
+    },
+    (err) => {
+      console.error("실시간 동기화 수신 실패:", err);
+    }
+  );
+
+  // boundaryStore는 drawingPlanId/draftPoints(그리는 중 임시 상태)도 같은 store에
+  // 있어 매 꼭짓점 클릭마다 알림이 오는데, 그건 아직 boundaries에 반영 전이라 굳이
+  // 매번 write할 필요가 없다 — boundaries 참조가 실제로 바뀐 경우에만 push한다.
+  const unsubscribeBoundary = useBoundaryStore.subscribe((state, prevState) => {
+    if (state.boundaries !== prevState.boundaries) pushLocalToFirestore(syncId);
+  });
+  const unsubscribeOverride = usePlanOverrideStore.subscribe(() => pushLocalToFirestore(syncId));
+
+  return () => {
+    unsubscribeSnapshot();
+    unsubscribeBoundary();
+    unsubscribeOverride();
+    if (writeTimer) clearTimeout(writeTimer);
+  };
+}
