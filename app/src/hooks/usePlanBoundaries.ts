@@ -20,7 +20,12 @@ interface PlanBoundaryGeoJSON {
 }
 
 async function fetchPlanBoundaries(): Promise<Record<string, LatLng[]>> {
-  const res = await fetch(`${import.meta.env.BASE_URL}data/plan_boundaries.geojson`);
+  // cache: "no-store" — usePlansData.ts와 동일한 이유. 특히 이 파일은 PC에서 새로
+  // 그린 경계를 커밋한 직후 확인하는 용도라 캐시로 인해 안 보이면 "또 안 된다"는
+  // 오해를 사기 쉽다.
+  const res = await fetch(`${import.meta.env.BASE_URL}data/plan_boundaries.geojson`, {
+    cache: "no-store",
+  });
   if (!res.ok) return {}; // 아직 커밋된 경계가 없어도 지도는 정상 동작해야 함
   const geojson: PlanBoundaryGeoJSON = await res.json();
   const result: Record<string, LatLng[]> = {};
