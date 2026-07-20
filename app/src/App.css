@@ -114,6 +114,15 @@
   min-height: 120px;
 }
 
+/* 데스크톱에서는 기존과 동일하게 SyncSetup/LocalDataExport/LocalDataImport가
+   항상 펼쳐져 보인다 — 토글 버튼은 모바일 전용이라 여기선 숨긴다. 아래
+   모바일 media query가 이 규칙을 display: block으로 덮어써야 하므로, 소스
+   순서상 반드시 media query보다 앞에 와야 한다(동일 우선순위면 나중 규칙이
+   이긴다). */
+.app__sync-tools-toggle {
+  display: none;
+}
+
 @media (max-width: 900px) {
   /* 모바일에서는 데스크톱처럼 "100vh 안에 순위표+지도+상세패널을 각각 내부
      스크롤 영역으로 욱여넣는" 방식이 안 맞는다 — app__right의 지도/상세패널
@@ -127,16 +136,15 @@
     min-height: 100vh;
   }
 
-  /* 소개문/가중치조절/동기화설정 등 부가 UI는 화면을 좁은 모바일에서 스크롤을
-     길게 만들기만 할 뿐이라 전부 숨긴다 — "지도 위, 목록 아래"만 바로 보이게. */
+  /* 소개문은 화면을 좁은 모바일에서 스크롤만 길게 만들 뿐이라 숨긴다 —
+     "지도 위, 목록 아래"가 바로 보이게. 가중치 조절(WeightPanel)은 이미
+     자체 토글로 기본 접힘 상태라 한 줄만 차지하므로 그대로 둔다. 동기화·백업
+     UI(SyncSetup/LocalDataExport/LocalDataImport)는 완전히 숨기면 모바일에서
+     동기화 코드를 연결/확인할 방법이 아예 없어져 버려서(실제로 이게 사업명이
+     기기간에 안 맞던 원인) app__sync-tools 토글 하나로 묶어 기본 접힘으로
+     둔다 — 아래 app__sync-tools 규칙 참고. */
   .app__subtitle,
-  .app__context-note,
-  .weight-panel,
-  .sync-setup,
-  .local-data-export,
-  .local-data-import,
-  .local-data-import__toggle,
-  .app__view-only-badge {
+  .app__context-note {
     display: none;
   }
 
@@ -166,14 +174,47 @@
      한다 — app__map의 원래 flex: 1.2 1 0%(flex-basis: 0%)가 남아있으면
      "채울 여백 없는" 콘텐츠 기반 flex 컨테이너 안에서는 명시적 height보다
      flex-basis가 우선 적용돼 결국 min-height(220px)로 주저앉는다. */
+  /* 지도가 순위표 스크롤에 밀려 올라가 버리면 지금 보고 있는 사업이 지도의
+     어디쯤인지 매번 다시 스크롤해서 확인해야 해서 불편하다 — 목록을 내려도
+     지도는 화면 위쪽에 고정되게 sticky를 쓴다. app__right가 display: contents로
+     사라졌으므로 sticky 기준(가장 가까운 스크롤 컨테이너)은 페이지(뷰포트)가
+     된다. z-index는 아래 순위표 thead의 sticky(RankingTable.css)보다 높여서
+     스크롤 시 표 헤더가 지도 위로 겹쳐 올라오지 않게 한다. */
   .app__map {
     flex: none;
     height: 280px;
     order: 1;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   }
 
   .app__left {
     order: 2;
+  }
+
+  /* 기본 접힘 — 펼쳤을 때만 SyncSetup/LocalDataExport/LocalDataImport가 보인다. */
+  .app__sync-tools-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border: 1px solid var(--border, #333);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .app__sync-tools-body {
+    display: none;
+  }
+
+  .app__sync-tools-body--open {
+    display: block;
   }
 
   /* app__map과 같은 이유로 flex를 꺼둔다 — PlanDetailPanel.css의 .plan-detail이
