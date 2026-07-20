@@ -3,6 +3,7 @@ import { usePlansData } from "./hooks/usePlansData";
 import { useBupyeongBoundary } from "./hooks/useBupyeongBoundary";
 import { usePlanBoundaries } from "./hooks/usePlanBoundaries";
 import { useFirestoreSync } from "./hooks/useFirestoreSync";
+import { useViewOnlyMode } from "./hooks/useViewOnlyMode";
 import { useRankingStore } from "./store/rankingStore";
 import { RankingTable } from "./components/ranking/RankingTable";
 import { MapView } from "./components/map/MapView";
@@ -20,6 +21,7 @@ function App() {
   const { data: committedBoundaries } = usePlanBoundaries();
   const selectedId = useRankingStore((s) => s.selectedId);
   const [mapExpanded, setMapExpanded] = useState(false);
+  const { readOnly } = useViewOnlyMode();
   useFirestoreSync();
 
   const features = useMemo(
@@ -69,9 +71,18 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
-          <SyncSetup />
-          <LocalDataExport />
-          <LocalDataImport />
+          {readOnly ? (
+            <div className="app__view-only-badge">
+              👀 보기 전용 모드 — 실시간으로 최신 상태를 보여주지만 이 화면에서는
+              수정할 수 없습니다
+            </div>
+          ) : (
+            <>
+              <SyncSetup />
+              <LocalDataExport />
+              <LocalDataImport />
+            </>
+          )}
           <RankingTable features={features} />
         </div>
         <div className="app__right">
@@ -81,7 +92,7 @@ function App() {
               adminBoundary={adminBoundary}
               committedBoundaries={committedBoundaries}
             />
-            <MapBoundaryControl />
+            {!readOnly && <MapBoundaryControl />}
             <button
               type="button"
               className="app__map-expand-toggle"

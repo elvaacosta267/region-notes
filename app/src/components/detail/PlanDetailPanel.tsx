@@ -7,6 +7,7 @@ import { commitNameOverride, planDisplayName } from "../../lib/planDisplayName";
 import { isRecentUpdate } from "../../lib/recentUpdate";
 import { useRankingStore } from "../../store/rankingStore";
 import { usePlanOverrideStore } from "../../store/planOverrideStore";
+import { useViewOnlyMode } from "../../hooks/useViewOnlyMode";
 import "./PlanDetailPanel.css";
 
 const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanFeature["properties"]; label: string }[] = [
@@ -19,6 +20,7 @@ const FACTOR_ROWS: { key: keyof PlanFeature["properties"]; basisKey: keyof PlanF
 ];
 
 export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
+  const { readOnly } = useViewOnlyMode();
   const weights = useRankingStore((s) => s.weights);
   const nameOverrides = usePlanOverrideStore((s) => s.nameOverrides);
   const setNameOverride = usePlanOverrideStore((s) => s.setNameOverride);
@@ -72,7 +74,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
   return (
     <div className="plan-detail">
       <h2 className="plan-detail__title">
-        {editingName ? (
+        {editingName && !readOnly ? (
           <input
             className="plan-detail__title-input"
             value={nameDraft}
@@ -87,31 +89,35 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         ) : (
           <>
             {name}
-            <button
-              type="button"
-              className="plan-detail__title-edit"
-              onClick={() => {
-                setNameDraft(name);
-                setEditingName(true);
-              }}
-              title="이름 수정"
-              aria-label="이름 수정"
-            >
-              ✏️
-            </button>
+            {!readOnly && (
+              <button
+                type="button"
+                className="plan-detail__title-edit"
+                onClick={() => {
+                  setNameDraft(name);
+                  setEditingName(true);
+                }}
+                title="이름 수정"
+                aria-label="이름 수정"
+              >
+                ✏️
+              </button>
+            )}
           </>
         )}
       </h2>
       {nameOverrides[p.id] && !editingName && (
         <div className="plan-detail__name-original">
           원래 표기: {p.사업명}{" "}
-          <button
-            type="button"
-            className="plan-detail__name-reset"
-            onClick={() => clearNameOverride(p.id)}
-          >
-            되돌리기
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              className="plan-detail__name-reset"
+              onClick={() => clearNameOverride(p.id)}
+            >
+              되돌리기
+            </button>
+          )}
         </div>
       )}
       <div className="plan-detail__meta">
@@ -227,9 +233,14 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           id="plan-detail-memo"
           className="plan-detail__memo"
           value={noteDraft}
-          placeholder="이 사업에 대해 기록해두고 싶은 내용을 적어보세요 (이 브라우저에만 저장됩니다)"
+          placeholder={
+            readOnly
+              ? "(메모 없음)"
+              : "이 사업에 대해 기록해두고 싶은 내용을 적어보세요 (이 브라우저에만 저장됩니다)"
+          }
+          readOnly={readOnly}
           onChange={(e) => setNoteDraft(e.target.value)}
-          onBlur={() => setNote(p.id, noteDraft)}
+          onBlur={() => !readOnly && setNote(p.id, noteDraft)}
         />
         <label className="plan-detail__user-notes-label" htmlFor="plan-detail-link">
           관련 링크
@@ -239,9 +250,10 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
             id="plan-detail-link"
             type="text"
             value={linkDraft}
-            placeholder="뉴스·블로그 등에서 찾은 관련 링크를 붙여넣으세요"
+            placeholder={readOnly ? "(링크 없음)" : "뉴스·블로그 등에서 찾은 관련 링크를 붙여넣으세요"}
+            readOnly={readOnly}
             onChange={(e) => setLinkDraft(e.target.value)}
-            onBlur={() => setExtraLink(p.id, linkDraft)}
+            onBlur={() => !readOnly && setExtraLink(p.id, linkDraft)}
           />
           {extraLinks[p.id] && (
             <a href={extraLinks[p.id]} target="_blank" rel="noopener noreferrer">

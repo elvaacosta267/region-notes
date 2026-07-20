@@ -119,3 +119,13 @@
     flex-direction: column;
   }
 }
+
+.app__view-only-badge {
+  font-size: 12px;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid var(--border, #333);
+  border-radius: 6px;
+  background: var(--row-hover, rgba(127, 127, 127, 0.1));
+  opacity: 0.85;
+}

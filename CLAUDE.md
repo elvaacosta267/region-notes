@@ -279,6 +279,23 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
     This is meaningfully weaker than real authentication, so avoid anything highly sensitive in
     `notes`. `VITE_FIREBASE_*` lives in `app/.env.local` locally and as GitHub Actions repo
     variables in CI (`.github/workflows/deploy.yml`), same two-places pattern as the Kakao key.
+  - **View-only sharing (`?view={syncId}` link)**: `hooks/useViewOnlyMode.ts` reads that query
+    param; when present, `hooks/useFirestoreSync.ts` connects to the *same* Firestore document
+    read-only (`startFirestoreSync(id, { readOnly: true })` — subscribes and applies incoming
+    data, but never subscribes to local store changes and never seeds an empty doc) and every
+    editing surface checks the same hook to hide itself: `RankingTable.tsx`'s per-row ✏️,
+    `PlanDetailPanel.tsx`'s title ✏️/"되돌리기"/memo textarea/link input (the latter two get the
+    native `readOnly` attribute rather than being removed, so existing content stays visible),
+    and `App.tsx` swaps `SyncSetup`/`LocalDataExport`/`LocalDataImport`/`MapBoundaryControl` for a
+    plain "보기 전용 모드" badge. `SyncSetup.tsx`'s connected view has a "보기 전용 링크 복사"
+    button that builds this URL from the current `syncId` for the editing user to hand to a
+    family member/mentor. This exists because the *same* sync code that lets a device read the
+    Firestore document also lets it write (Firestore rules can't distinguish "this device should
+    only ever read" without real per-identity auth, which this project deliberately doesn't
+    build), so read-only enforcement here is UI-level, not server-level — technically savvy someone
+    could still extract the code from the URL and paste it into the normal "코드 입력" field to
+    gain full write access. Good enough for sharing with a trusted few (family, an advisor), not a
+    substitute for real access control — don't present this as secure to a wider audience.
   - **Same-day, device-to-device, manual (fallback for users without a Firebase project)**:
     `components/filters/LocalDataExport.tsx` serializes *both* stores — boundaries, name
     overrides, notes, and extra links — into one JSON blob (clipboard, with a `<textarea>`

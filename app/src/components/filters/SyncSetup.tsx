@@ -17,8 +17,10 @@ export function SyncSetup() {
   const setSyncId = useSyncStore((s) => s.setSyncId);
   const [inputCode, setInputCode] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
+  const [viewLinkCopyStatus, setViewLinkCopyStatus] = useState<"idle" | "copied">("idle");
 
   if (syncId) {
+    const viewLink = `${window.location.origin}${window.location.pathname}?view=${syncId}`;
     const handleCopy = async () => {
       try {
         await navigator.clipboard.writeText(syncId);
@@ -28,16 +30,35 @@ export function SyncSetup() {
         // 클립보드 권한이 막혀도 코드가 아래 <code>로 항상 화면에 보이므로 수동 복사 가능
       }
     };
+    const handleCopyViewLink = async () => {
+      try {
+        await navigator.clipboard.writeText(viewLink);
+        setViewLinkCopyStatus("copied");
+        setTimeout(() => setViewLinkCopyStatus("idle"), 2000);
+      } catch {
+        // 아래 안내 문구에서 무슨 값을 복사해야 하는지 알 수 있으므로 수동 복사 가능
+      }
+    };
     return (
-      <div className="sync-setup sync-setup--connected">
-        <span className="sync-setup__status">● 실시간 동기화 켜짐</span>
-        <code className="sync-setup__code">{syncId}</code>
-        <button type="button" onClick={handleCopy}>
-          {copyStatus === "copied" ? "복사됨" : "코드 복사"}
-        </button>
-        <button type="button" onClick={() => setSyncId(null)}>
-          연결 해제
-        </button>
+      <div className="sync-setup">
+        <div className="sync-setup__row">
+          <span className="sync-setup__status">● 실시간 동기화 켜짐</span>
+          <code className="sync-setup__code">{syncId}</code>
+          <button type="button" onClick={handleCopy}>
+            {copyStatus === "copied" ? "복사됨" : "코드 복사"}
+          </button>
+          <button type="button" onClick={() => setSyncId(null)}>
+            연결 해제
+          </button>
+        </div>
+        <div className="sync-setup__row">
+          <span className="sync-setup__hint">
+            수정은 못 하고 보기만 하게 하려면(가족·지인 공유용):
+          </span>
+          <button type="button" onClick={handleCopyViewLink}>
+            {viewLinkCopyStatus === "copied" ? "링크 복사됨" : "보기 전용 링크 복사"}
+          </button>
+        </div>
       </div>
     );
   }
