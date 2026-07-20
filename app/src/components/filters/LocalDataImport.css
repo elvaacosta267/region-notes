@@ -1,4 +1,4 @@
-.boundary-import__toggle {
+.local-data-import__toggle {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 4px;
@@ -8,7 +8,7 @@
   margin: 8px 0;
 }
 
-.boundary-import {
+.local-data-import {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -19,12 +19,12 @@
   border-radius: 6px;
 }
 
-.boundary-import__hint {
+.local-data-import__hint {
   opacity: 0.75;
   margin: 0;
 }
 
-.boundary-import__textarea {
+.local-data-import__textarea {
   width: 100%;
   height: 80px;
   font-family: monospace;
@@ -36,12 +36,12 @@
   border-radius: 4px;
 }
 
-.boundary-import__actions {
+.local-data-import__actions {
   display: flex;
   gap: 8px;
 }
 
-.boundary-import__actions button {
+.local-data-import__actions button {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 4px;
@@ -50,10 +50,10 @@
   cursor: pointer;
 }
 
-.boundary-import__status {
+.local-data-import__status {
   opacity: 0.85;
 }
 
-.boundary-import__status--error {
+.local-data-import__status--error {
   color: #dc2626;
 }

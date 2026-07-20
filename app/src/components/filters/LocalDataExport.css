@@ -1,4 +1,4 @@
-.boundary-export {
+.local-data-export {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -7,14 +7,14 @@
   margin: 8px 0;
 }
 
-.boundary-export__fallback {
+.local-data-export__fallback {
   width: 100%;
   height: 80px;
   font-family: monospace;
   font-size: 11px;
 }
 
-.boundary-export button {
+.local-data-export button {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 4px;
@@ -23,6 +23,6 @@
   cursor: pointer;
 }
 
-.boundary-export__status {
+.local-data-export__status {
   opacity: 0.75;
 }

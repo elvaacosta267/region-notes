@@ -3,12 +3,13 @@ import { persist } from "zustand/middleware";
 
 // 정비구역 경계(폴리곤)를 사용자가 지도 위에서 직접 클릭해 그리는 기능의 상태.
 // 카카오맵 무료 API가 지적도 폴리곤을 안 주기 때문에(CLAUDE.md 참고) 사용자가
-// 손으로 그린 경계를 대신 쓴다. 이 앱은 정적 사이트(백엔드 없음)라 브라우저
-// localStorage에만 저장된다 — 기기를 바꾸면 사라지므로, WeightPanel 옆 "경계
-// 내보내기" 버튼으로 JSON을 복사해 다른 기기의 "가져오기"(importBoundaries)에
-// 붙여넣으면 그 자리에서 바로 반영된다. 영구 백업이 필요하면 같은 JSON을
-// Claude에게 줘서 geo/plan_boundaries.geojson에 커밋할 수도 있다(README 업데이트
-// 루프와 동일한 패턴, 선택 사항 — CLAUDE.md 참고).
+// 손으로 그린 경계를 대신 쓴다. 기본은 이 브라우저의 localStorage에만 저장되지만,
+// hooks/useFirestoreSync.ts로 동기화 코드를 연결해두면 lib/firestoreSync.ts가
+// replaceBoundaries를 통해 다른 기기와 실시간(수 초 내) 자동 동기화한다 — 그게
+// 없으면 기기를 바꿀 때 사라지므로, WeightPanel 옆 "내보내기" 버튼으로 JSON을
+// 복사해 다른 기기의 "가져오기"(importBoundaries)에 붙여넣는 수동 경로도 남아있다.
+// 영구 백업이 필요하면 같은 JSON을 Claude에게 줘서 geo/plan_boundaries.geojson에
+// 커밋할 수도 있다(README 업데이트 루프와 동일한 패턴, 선택 사항 — CLAUDE.md 참고).
 export type LatLng = { lat: number; lng: number };
 
 interface BoundaryState {
@@ -23,6 +24,7 @@ interface BoundaryState {
   cancelDrawing: () => void;
   clearBoundary: (planId: string) => void;
   importBoundaries: (data: Record<string, LatLng[]>) => void;
+  replaceBoundaries: (data: Record<string, LatLng[]>) => void;
 }
 
 export const useBoundaryStore = create<BoundaryState>()(
@@ -79,6 +81,11 @@ export const useBoundaryStore = create<BoundaryState>()(
           );
           return { boundaries: { ...state.boundaries, ...valid } };
         }),
+
+      // lib/firestoreSync.ts 전용 — 원격(Firestore) 상태를 그대로 이 기기의 상태로
+      // 덮어쓴다. importBoundaries(upsert)와 달리 다른 기기에서 삭제한 경계도
+      // 이 기기에서 사라져야 실시간 동기화가 정확히 맞는다.
+      replaceBoundaries: (data) => set({ boundaries: data }),
     }),
     {
       name: "region-notes-plan-boundaries",

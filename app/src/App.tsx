@@ -2,14 +2,16 @@ import { useMemo, useState } from "react";
 import { usePlansData } from "./hooks/usePlansData";
 import { useBupyeongBoundary } from "./hooks/useBupyeongBoundary";
 import { usePlanBoundaries } from "./hooks/usePlanBoundaries";
+import { useFirestoreSync } from "./hooks/useFirestoreSync";
 import { useRankingStore } from "./store/rankingStore";
 import { RankingTable } from "./components/ranking/RankingTable";
 import { MapView } from "./components/map/MapView";
 import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
-import { BoundaryExport } from "./components/filters/BoundaryExport";
-import { BoundaryImport } from "./components/filters/BoundaryImport";
+import { SyncSetup } from "./components/filters/SyncSetup";
+import { LocalDataExport } from "./components/filters/LocalDataExport";
+import { LocalDataImport } from "./components/filters/LocalDataImport";
 import "./App.css";
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
   const { data: committedBoundaries } = usePlanBoundaries();
   const selectedId = useRankingStore((s) => s.selectedId);
   const [mapExpanded, setMapExpanded] = useState(false);
+  useFirestoreSync();
 
   const features = useMemo(
     () =>
@@ -66,8 +69,9 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
-          <BoundaryExport />
-          <BoundaryImport />
+          <SyncSetup />
+          <LocalDataExport />
+          <LocalDataImport />
           <RankingTable features={features} />
         </div>
         <div className="app__right">
