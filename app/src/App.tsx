@@ -72,10 +72,11 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
+          <SyncSetup />
           {readOnly ? (
             <div className="app__view-only-badge">
-              👀 보기 전용 모드 — 실시간으로 최신 상태를 보여주지만 이 화면에서는
-              수정할 수 없습니다
+              👀 보기 전용 모드 — 실시간으로 최신 상태를 보여줍니다. 수정하려면 위에서
+              이 기기를 편집 기기로 설정하세요.
             </div>
           ) : (
             <div className="app__sync-tools">
@@ -84,14 +85,13 @@ function App() {
                 className="app__sync-tools-toggle"
                 onClick={() => setSyncToolsOpen((v) => !v)}
               >
-                {syncToolsOpen ? "▾" : "▸"} 기기간 동기화·백업 설정
+                {syncToolsOpen ? "▾" : "▸"} 백업·가져오기(선택)
               </button>
               <div
                 className={`app__sync-tools-body ${
                   syncToolsOpen ? "app__sync-tools-body--open" : ""
                 }`}
               >
-                <SyncSetup />
                 <LocalDataExport />
                 <LocalDataImport />
               </div>

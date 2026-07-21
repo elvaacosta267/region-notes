@@ -27,20 +27,6 @@
   white-space: nowrap;
 }
 
-.sync-setup__code {
-  font-family: monospace;
-  background: var(--row-hover, rgba(127, 127, 127, 0.15));
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.sync-setup__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
 .sync-setup button {
   font-size: 12px;
   padding: 4px 10px;
@@ -48,13 +34,4 @@
   border: 1px solid var(--border, #333);
   background: transparent;
   cursor: pointer;
-}
-
-.sync-setup input {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border, #333);
-  background: var(--bg, transparent);
-  color: inherit;
 }

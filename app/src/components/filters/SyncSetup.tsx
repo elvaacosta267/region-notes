@@ -1,62 +1,34 @@
-import { useState } from "react";
 import { useSyncStore } from "../../store/syncStore";
 import "./SyncSetup.css";
 
-// 사람이 손으로 다른 기기에 옮기기 편한 코드 — Firestore 문서 경로로 쓰인다.
-// 이 코드를 아는 사람만 데이터에 접근 가능하다(보안 규칙에서 list 금지, get만 허용
-// — CLAUDE.md 참고). 128비트 UUID 전체 대신 앞 12자만 써도 이 앱 하나가 쓰는
-// 컬렉션 안에서 우연히 겹칠 확률은 무시할 수준이다.
-function generateSyncCode(): string {
-  return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
-}
-
-// 실시간 동기화 코드 발급/입력 UI — 한 번만 설정해두면 이후 모든 경계/사업명/메모/
-// 링크 수정이 기기 간에 자동으로(수 초 내) 반영된다(hooks/useFirestoreSync.ts).
+// 편집 기기 지정 UI — 예전엔 기기마다 동기화 코드를 만들고 서로 입력해 맞춰야
+// 했는데(그 결과 PC와 모바일이 다른 코드에 연결되거나 연결 자체가 누락되는 문제가
+// 반복됐다), 이제 Firestore 문서 경로가 고정(VITE_SYNC_ID)이라 코드를 다룰 필요가
+// 없다. 유일하게 남은 선택은 "이 브라우저가 편집 기기인가"뿐이다 — 켜면 이후 이
+// 브라우저에서 고치는 모든 내용이 실시간으로 다른 모든 화면에 반영된다
+// (hooks/useFirestoreSync.ts).
 export function SyncSetup() {
-  const syncId = useSyncStore((s) => s.syncId);
-  const setSyncId = useSyncStore((s) => s.setSyncId);
-  const [inputCode, setInputCode] = useState("");
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied">("idle");
-  const [viewLinkCopyStatus, setViewLinkCopyStatus] = useState<"idle" | "copied">("idle");
+  const isEditor = useSyncStore((s) => s.isEditor);
+  const setIsEditor = useSyncStore((s) => s.setIsEditor);
 
-  if (syncId) {
-    const viewLink = `${window.location.origin}${window.location.pathname}?view=${syncId}`;
-    const handleCopy = async () => {
-      try {
-        await navigator.clipboard.writeText(syncId);
-        setCopyStatus("copied");
-        setTimeout(() => setCopyStatus("idle"), 2000);
-      } catch {
-        // 클립보드 권한이 막혀도 코드가 아래 <code>로 항상 화면에 보이므로 수동 복사 가능
-      }
-    };
-    const handleCopyViewLink = async () => {
-      try {
-        await navigator.clipboard.writeText(viewLink);
-        setViewLinkCopyStatus("copied");
-        setTimeout(() => setViewLinkCopyStatus("idle"), 2000);
-      } catch {
-        // 아래 안내 문구에서 무슨 값을 복사해야 하는지 알 수 있으므로 수동 복사 가능
-      }
-    };
+  if (isEditor) {
     return (
       <div className="sync-setup">
         <div className="sync-setup__row">
-          <span className="sync-setup__status">● 실시간 동기화 켜짐</span>
-          <code className="sync-setup__code">{syncId}</code>
-          <button type="button" onClick={handleCopy}>
-            {copyStatus === "copied" ? "복사됨" : "코드 복사"}
-          </button>
-          <button type="button" onClick={() => setSyncId(null)}>
-            연결 해제
-          </button>
-        </div>
-        <div className="sync-setup__row">
-          <span className="sync-setup__hint">
-            수정은 못 하고 보기만 하게 하려면(가족·지인 공유용):
-          </span>
-          <button type="button" onClick={handleCopyViewLink}>
-            {viewLinkCopyStatus === "copied" ? "링크 복사됨" : "보기 전용 링크 복사"}
+          <span className="sync-setup__status">✏️ 편집 기기로 설정됨</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm(
+                  "이 기기의 편집 권한을 해제할까요? 이후 이 화면은 보기 전용으로 바뀝니다."
+                )
+              ) {
+                setIsEditor(false);
+              }
+            }}
+          >
+            편집 기기 해제
           </button>
         </div>
       </div>
@@ -66,23 +38,25 @@ export function SyncSetup() {
   return (
     <div className="sync-setup">
       <p className="sync-setup__hint">
-        코드를 만들고 다른 기기에 똑같이 입력하면, 이후 이 기기에서 고친 내용이
-        버튼 없이 자동으로 반영됩니다.
+        이 브라우저를 편집 기기로 설정하면, 이후 여기서 고친 사업명·메모·경계 등이
+        버튼 없이 실시간으로 다른 모든 화면에 반영됩니다. 편집 기기는 한 곳으로만
+        유지하세요 — 여러 기기를 동시에 편집 기기로 설정하면 서로 덮어쓸 수
+        있습니다.
       </p>
-      <div className="sync-setup__actions">
-        <button type="button" onClick={() => setSyncId(generateSyncCode())}>
-          새 동기화 코드 만들기
-        </button>
-        <input
-          type="text"
-          value={inputCode}
-          onChange={(e) => setInputCode(e.target.value.trim())}
-          placeholder="다른 기기에서 만든 코드 입력"
-        />
-        <button type="button" onClick={() => setSyncId(inputCode)} disabled={!inputCode}>
-          연결
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => {
+          if (
+            window.confirm(
+              "이 브라우저를 편집 기기로 설정할까요? 이후 이 브라우저에서 고치는 모든 내용이 실시간으로 다른 모든 화면에 반영됩니다."
+            )
+          ) {
+            setIsEditor(true);
+          }
+        }}
+      >
+        이 기기를 편집 기기로 설정
+      </button>
     </div>
   );
 }
