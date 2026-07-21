@@ -63,6 +63,18 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
 
   const ranked = useMemo(() => rankPlans(features, weights), [features, weights]);
 
+  // 점수가 같으면 같은 순위(공동 순위)로 표기한다 — 표준 경쟁 순위 방식이라
+  // 동점자 다음 순위는 동점자 수만큼 건너뛴다(예: 공동 1위가 7건이면 다음은 8위).
+  // ranked는 이미 점수 내림차순 정렬돼 있으므로, 바로 앞 항목과 점수가 같으면
+  // 순위를 그대로 이어받고 다르면 "지금까지 몇 건 지났는지"(i+1)로 갱신한다.
+  const displayRanks = useMemo(() => {
+    const ranks: number[] = [];
+    ranked.forEach((sp, i) => {
+      ranks.push(i > 0 && sp.score === ranked[i - 1].score ? ranks[i - 1] : i + 1);
+    });
+    return ranks;
+  }, [ranked]);
+
   // 같은 지정표기(대표지번 기반)를 쓰는 사업이 2건 이상이면 동일지번 중복등재
   // 후보로 보고 표시한다 — 예: 갈산동64-12 / 갈산동 64-12번지 일원.
   const zoneLabelCounts = useMemo(() => {
@@ -109,7 +121,7 @@ export function RankingTable({ features }: { features: PlanFeature[] }) {
                 className={isSelected ? "ranking-table__row--selected" : ""}
                 onClick={() => selectPlan(p.id)}
               >
-                <td>{i + 1}</td>
+                <td>{displayRanks[i]}</td>
                 <td className="ranking-table__name">
                   <span className="ranking-table__name-row">
                     <span className="ranking-table__dot" style={{ background: p.color }} />
