@@ -114,16 +114,6 @@
   min-height: 120px;
 }
 
-/* 데스크톱에서는 기존과 동일하게 LocalDataExport/LocalDataImport(수동 백업/
-   가져오기 — 편집 기기가 아니면 애초에 안 보임)가 항상 펼쳐져 보인다. 토글
-   버튼은 모바일 전용이라 여기선 숨긴다. 아래 모바일 media query가 이 규칙을
-   display: block으로 덮어써야 하므로, 소스 순서상 반드시 media query보다
-   앞에 와야 한다(동일 우선순위면 나중 규칙이 이긴다). SyncSetup(편집 기기
-   전환)은 이 토글과 무관하게 항상 노출된다 — App.tsx 참고. */
-.app__sync-tools-toggle {
-  display: none;
-}
-
 @media (max-width: 900px) {
   /* 모바일에서는 데스크톱처럼 "100vh 안에 순위표+지도+상세패널을 각각 내부
      스크롤 영역으로 욱여넣는" 방식이 안 맞는다 — app__right의 지도/상세패널
@@ -139,10 +129,7 @@
 
   /* 소개문은 화면을 좁은 모바일에서 스크롤만 길게 만들 뿐이라 숨긴다 —
      "지도 위, 목록 아래"가 바로 보이게. 가중치 조절(WeightPanel)과
-     SyncSetup(편집 기기 전환)은 둘 다 원래 한두 줄만 차지하는 짧은 UI라
-     그대로 둔다. LocalDataExport/LocalDataImport(수동 백업/가져오기 — 어차피
-     편집 기기가 아니면 안 보임)만 app__sync-tools 토글로 묶어 기본 접힘으로
-     둔다 — 아래 app__sync-tools 규칙 참고. */
+     SyncSetup(편집 기기 전환)은 둘 다 한두 줄만 차지하는 짧은 UI라 그대로 둔다. */
   .app__subtitle,
   .app__context-note {
     display: none;
@@ -192,29 +179,6 @@
 
   .app__left {
     order: 2;
-  }
-
-  /* 기본 접힘 — 펼쳤을 때만 SyncSetup/LocalDataExport/LocalDataImport가 보인다. */
-  .app__sync-tools-toggle {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 8px 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
-    border: 1px solid var(--border, #333);
-    border-radius: 6px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .app__sync-tools-body {
-    display: none;
-  }
-
-  .app__sync-tools-body--open {
-    display: block;
   }
 
   /* app__map과 같은 이유로 flex를 꺼둔다 — PlanDetailPanel.css의 .plan-detail이

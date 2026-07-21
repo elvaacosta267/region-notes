@@ -11,8 +11,6 @@ import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
 import { SyncSetup } from "./components/filters/SyncSetup";
-import { LocalDataExport } from "./components/filters/LocalDataExport";
-import { LocalDataImport } from "./components/filters/LocalDataImport";
 import "./App.css";
 
 function App() {
@@ -21,7 +19,6 @@ function App() {
   const { data: committedBoundaries } = usePlanBoundaries();
   const selectedId = useRankingStore((s) => s.selectedId);
   const [mapExpanded, setMapExpanded] = useState(false);
-  const [syncToolsOpen, setSyncToolsOpen] = useState(false);
   const { readOnly } = useViewOnlyMode();
   useFirestoreSync();
 
@@ -73,28 +70,10 @@ function App() {
         <div className="app__left">
           <WeightPanel />
           <SyncSetup />
-          {readOnly ? (
+          {readOnly && (
             <div className="app__view-only-badge">
               👀 보기 전용 모드 — 실시간으로 최신 상태를 보여줍니다. 수정하려면 위에서
               이 기기를 편집 기기로 설정하세요.
-            </div>
-          ) : (
-            <div className="app__sync-tools">
-              <button
-                type="button"
-                className="app__sync-tools-toggle"
-                onClick={() => setSyncToolsOpen((v) => !v)}
-              >
-                {syncToolsOpen ? "▾" : "▸"} 백업·가져오기(선택)
-              </button>
-              <div
-                className={`app__sync-tools-body ${
-                  syncToolsOpen ? "app__sync-tools-body--open" : ""
-                }`}
-              >
-                <LocalDataExport />
-                <LocalDataImport />
-              </div>
             </div>
           )}
           <RankingTable features={features} />

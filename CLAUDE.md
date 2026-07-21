@@ -252,8 +252,8 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   deliberately *not* persisted, or a page reload would permanently strand the map in draw-mode).
   On its own, this data never leaves the browser it was drawn in (same for
   `store/planOverrideStore.ts` — 사업명 수정 override, 메모, 관련 링크, edited from
-  `PlanDetailPanel.tsx`'s ✏️ button and memo/link fields). There are three complementary sync
-  paths out of that single browser, in the order the app actually tries them:
+  `PlanDetailPanel.tsx`'s ✏️ button and memo/link fields). There are two complementary sync paths
+  out of the editor device's browser:
   - **Real-time, automatic (primary)**: `lib/firestoreSync.ts` + `hooks/useFirestoreSync.ts` +
     `components/filters/SyncSetup.tsx`. Unlike an earlier version of this feature, the Firestore
     document path is now a single **fixed** value (`VITE_SYNC_ID`, baked into the build like
@@ -276,9 +276,8 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
     editor's `startFirestoreSync` never subscribes to `onSnapshot` at all, so nothing Firestore
     holds can ever flow back into the editor's local state. Read-only viewers do the reverse: they
     only ever *subscribe* via `onSnapshot` and apply incoming data to both stores via
-    `replaceBoundaries`/`replaceOverrides` (a full replace, not an upsert — unlike
-    `importBoundaries`/`importOverrides` below, this must propagate *deletions* too, or a
-    boundary/note removed on the editor device would linger forever on viewers); they never write.
+    `replaceBoundaries`/`replaceOverrides` (a full replace — this must propagate *deletions* too, or
+    a boundary/note removed on the editor device would linger forever on viewers); they never write.
     An earlier version of this code had the editor device apply incoming snapshots too (with an
     `applyingRemote` flag just to stop the obvious immediate feedback loop from its own writes) —
     that meant *any* stale or empty data already sitting in Firestore (leftover test writes, a
@@ -303,34 +302,36 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
     surface checks it to hide itself: `RankingTable.tsx`'s per-row ✏️, `PlanDetailPanel.tsx`'s
     title ✏️/"되돌리기"/memo textarea/link input (the latter two get the native `readOnly`
     attribute rather than being removed, so existing content stays visible), and `App.tsx` swaps
-    `LocalDataExport`/`LocalDataImport`/`MapBoundaryControl` for a plain "보기 전용 모드" badge
-    (`SyncSetup` itself always renders regardless of `readOnly`, since it's the only control that
-    can ever turn a fresh device *into* the editor). Sharing the app with family/an advisor is now
-    just "send them the plain URL" — there's no separate `?view=` link to generate, since every
-    device is read-only by default until someone deliberately opts it into editing.
-  - **Same-day, device-to-device, manual (fallback for users without a Firebase project)**:
-    `components/filters/LocalDataExport.tsx` serializes *both* stores — boundaries, name
-    overrides, notes, and extra links — into one JSON blob (clipboard, with a `<textarea>`
-    fallback for when `navigator.clipboard` is blocked), and `components/filters/LocalDataImport.tsx`
-    (a paste-a-JSON-blob textarea gated behind a toggle button) calls `boundaryStore`'s
-    `importBoundaries(data)` and `planOverrideStore`'s `importOverrides(data)` to *upsert* that
-    JSON into *this* browser's localStorage — no git/deploy round-trip, no Claude involvement, but
-    also no automatic deletion propagation and no automatic push (the user has to remember to
-    click both buttons). (It also still parses the older boundaries-only flat export format for
-    backward compat.)
-  - **Permanent, cross-session baseline (boundaries only)**: hand an exported JSON to Claude to
-    commit into `geo/plan_boundaries.geojson` (`tools/import_plan_boundaries.py`, see Commands
-    section — same upsert-by-plan-id semantics as `importBoundaries`, just persisted to git
-    instead of localStorage) — same pattern as the README's 업데이트 루프, just for geometry
-    instead of CSV rows. This matters for durability (a cleared cache/new browser profile that's
-    lost its `isEditor` flag, or a brand-new device that was never made the editor, doesn't lose
-    anything) — it's the fallback of last resort now that real-time sync exists, not the fast
-    path. `planOverrideStore` data
-    deliberately has **no** git-committed equivalent: `notes` is a private, freeform investment
-    memo that must never end up in this public repo (Firestore is fine — it's not the git repo —
-    but git is not), and `nameOverrides`/`extraLinks` should graduate to a real `db/plans.csv`
-    edit (sourced) instead of a permanent side-channel once confirmed — ask Claude to make that
-    CSV edit directly rather than routing it through this sync mechanism.
+    `MapBoundaryControl` for a plain "보기 전용 모드" badge (`SyncSetup` itself always renders
+    regardless of `readOnly`, since it's the only control that can ever turn a fresh device *into*
+    the editor). Sharing the app with family/an advisor is now just "send them the plain URL" —
+    there's no separate `?view=` link to generate, since every device is read-only by default
+    until someone deliberately opts it into editing. There used to be a second sync path here —
+    `components/filters/LocalDataExport.tsx`/`LocalDataImport.tsx`, a manual copy-a-JSON-blob
+    fallback for users without a Firebase project — but it was deleted once Firestore sync fully
+    replaced the need for it: with automatic real-time sync always on, those buttons only added
+    confusion ("do I need to click 내보내기 for my edit to show up?" — no, it's already automatic)
+    without adding any capability the editor device didn't already have. If a user-facing manual
+    export/import is ever needed again (e.g. supporting a deployment with no Firebase project),
+    reintroduce it deliberately rather than assuming this old code can be resurrected as-is — the
+    store actions it depended on (`importBoundaries`/`importOverrides`, upsert semantics) were
+    removed along with it, since `replaceBoundaries`/`replaceOverrides` (full-replace, used by
+    Firestore sync) are the only store-level sync primitives that remain.
+  - **Permanent, cross-session baseline (boundaries only)**: hand the current boundary data (e.g.
+    from Firestore, or from `boundaryStore`'s persisted state) to Claude to commit into
+    `geo/plan_boundaries.geojson` (`tools/import_plan_boundaries.py`, see Commands section — upserts
+    by plan id, persisted to git instead of localStorage) — same pattern as the README's 업데이트
+    루프, just for geometry instead of CSV rows. This matters for durability: Firestore is not a
+    version-controlled backup (an accidental empty write, like the one described above, has no undo
+    or history), and a cleared cache/new browser profile that's lost its `isEditor` flag doesn't
+    lose anything as long as this file was kept current. It's the fallback of last resort now that
+    real-time sync exists, not the fast path — but given the incident above, it's worth running
+    periodically as real insurance, not just for brand-new devices. `planOverrideStore` data
+    deliberately has **no** git-committed equivalent: `notes` is a private, freeform investment memo
+    that must never end up in this public repo (Firestore is fine — it's not the git repo — but git
+    is not), and `nameOverrides`/`extraLinks` should graduate to a real `db/plans.csv` edit (sourced)
+    instead of a permanent side-channel once confirmed — ask Claude to make that CSV edit directly
+    rather than routing it through this sync mechanism.
 - `geo/plan_boundaries.geojson` + `hooks/usePlanBoundaries.ts` — the committed counterpart to the
   localStorage-only boundaries above (see previous bullet for why both exist). This exists because
   a boundary drawn on one phone/browser used to be invisible everywhere else (including other
