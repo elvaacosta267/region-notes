@@ -9,20 +9,9 @@ import { usePlanOverrideStore } from "../store/planOverrideStore";
 // 기기가 설정 없이 자동으로 같은 문서를 구독한다.
 const SYNC_ID = import.meta.env.VITE_SYNC_ID;
 
-// PC에서 그린 경계/고친 사업명·메모·링크가 다른 기기에 버튼 없이 자동으로(수 초 내)
-// 반영되도록 하는 실시간 동기화 엔진.
-//
-// 문서 하나(syncs/{SYNC_ID}/state/data)에 boundaryStore + planOverrideStore를 합쳐
-// 저장한다. 로컬 변경 -> Firestore로 write, Firestore 변경(편집 기기가 쓴 것) ->
-// 로컬 store로 apply, 두 방향을 동시에 구독하므로 무한루프를 막아야 한다:
-// applyingRemote 플래그를 원격 값을 로컬에 적용하는 그 순간만 true로 켜두고,
-// 로컬 변경 구독 콜백은 이 플래그가 true면 아무것도 안 한다(Zustand의 set()은
-// 구독자를 동기적으로 호출하므로 이 플래그로 정확히 구분된다).
-let applyingRemote = false;
 let writeTimer: ReturnType<typeof setTimeout> | null = null;
 
 function pushLocalToFirestore() {
-  if (applyingRemote) return;
   if (writeTimer) clearTimeout(writeTimer);
   // 짧은 시간에 여러 필드가 연달아 바뀌는 경우(예: 경계를 여러 점 찍는 중)를
   // 하나의 write로 묶기 위한 디바운스 — 매 클릭마다 네트워크 요청을 보내지 않는다.
@@ -43,53 +32,51 @@ function pushLocalToFirestore() {
 }
 
 // readOnly: true(편집 기기로 설정되지 않은 모든 화면 — hooks/useViewOnlyMode.ts)면
-// 원격 값을 받아서 로컬에 반영만 하고, 이 기기의 어떤 변화도 Firestore에 쓰지
-// 않는다 — 문서가 아직 없을 때의 "초기값 올리기"도 쓰기이므로 건너뛴다. UI 쪽에서도
-// 편집 컨트롤을 숨기지만(각 컴포넌트의 useViewOnlyMode 체크), 여기서도 한 번 더
-// 막아 이중으로 안전하게 한다.
+// Firestore가 유일한 진실이다 — 원격 변경을 그대로 로컬에 반영만 하고, 이 기기는
+// 절대 쓰지 않는다.
+//
+// readOnly: false(편집 기기, 이 프로젝트에서 딱 하나여야 함)면 정확히 반대다 — 이
+// 브라우저의 로컬 상태가 유일한 진실이고, Firestore는 절대 읽어서 로컬에 반영하지
+// 않는다. 예전 구현은 편집 기기도 원격 스냅샷을 로컬에 그대로 덮어썼는데, 그 결과
+// 이 기기가 연결되는 순간 Firestore에 남아있던 값(다른 기기가 쓴 값이든, 테스트로
+// 남은 값이든)이 이 기기의 로컬 경계/사업명 수정 내용을 통째로 지워버리는 사고가
+// 실제로 발생했다 — "PC에서만 수정, 나머지는 전부 실시간 보기 전용"이라는 모델
+// 자체가 편집 기기의 로컬 상태를 유일한 소스 오브 트루스로 취급해야 성립하므로,
+// 편집 기기는 연결 즉시(그리고 로컬이 바뀔 때마다) 자기 상태를 Firestore로
+// 밀어넣기만 하고 절대 되읽지 않는다.
 export function startFirestoreSync(options: { readOnly?: boolean } = {}): () => void {
   const readOnly = options.readOnly ?? true;
+
+  if (!readOnly) {
+    pushLocalToFirestore();
+    const unsubscribeBoundary = useBoundaryStore.subscribe((state, prevState) => {
+      if (state.boundaries !== prevState.boundaries) pushLocalToFirestore();
+    });
+    const unsubscribeOverride = usePlanOverrideStore.subscribe(() => pushLocalToFirestore());
+    return () => {
+      unsubscribeBoundary();
+      unsubscribeOverride();
+      if (writeTimer) clearTimeout(writeTimer);
+    };
+  }
+
   const db = getFirestore(firebaseApp);
   const ref = doc(db, "syncs", SYNC_ID, "state", "data");
-
   const unsubscribeSnapshot = onSnapshot(
     ref,
     (snap) => {
-      if (!snap.exists()) {
-        if (!readOnly) pushLocalToFirestore(); // 편집 기기가 처음 연결 — 초기값으로 올림
-        return;
-      }
+      if (!snap.exists()) return;
       const data = snap.data();
-      applyingRemote = true;
       useBoundaryStore.getState().replaceBoundaries(data.boundaries ?? {});
       usePlanOverrideStore.getState().replaceOverrides({
         nameOverrides: data.nameOverrides ?? {},
         notes: data.notes ?? {},
         extraLinks: data.extraLinks ?? {},
       });
-      applyingRemote = false;
     },
     (err) => {
       console.error("실시간 동기화 수신 실패:", err);
     }
   );
-
-  if (readOnly) {
-    return () => unsubscribeSnapshot();
-  }
-
-  // boundaryStore는 drawingPlanId/draftPoints(그리는 중 임시 상태)도 같은 store에
-  // 있어 매 꼭짓점 클릭마다 알림이 오는데, 그건 아직 boundaries에 반영 전이라 굳이
-  // 매번 write할 필요가 없다 — boundaries 참조가 실제로 바뀐 경우에만 push한다.
-  const unsubscribeBoundary = useBoundaryStore.subscribe((state, prevState) => {
-    if (state.boundaries !== prevState.boundaries) pushLocalToFirestore();
-  });
-  const unsubscribeOverride = usePlanOverrideStore.subscribe(() => pushLocalToFirestore());
-
-  return () => {
-    unsubscribeSnapshot();
-    unsubscribeBoundary();
-    unsubscribeOverride();
-    if (writeTimer) clearTimeout(writeTimer);
-  };
+  return () => unsubscribeSnapshot();
 }

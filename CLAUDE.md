@@ -267,14 +267,30 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
     the old model let PC and mobile end up connected to *different* codes (or mobile never
     connected at all) with no obvious symptom beyond "이름이 기기마다 달라 보여", which took
     several rounds to diagnose. With a fixed path that class of bug can't recur — there's only one
-    document, period. Every local change to `boundaryStore`/`planOverrideStore` on the editor
-    device is pushed (debounced 400ms) to that document, and every device's `onSnapshot` listener
-    applies incoming changes back to both stores via `replaceBoundaries`/`replaceOverrides` (a full
-    replace, not an upsert — unlike `importBoundaries`/`importOverrides` below, this must propagate
-    *deletions* too, or a boundary/note removed on the editor device would linger forever on
-    viewers). An `applyingRemote` module-level flag in `firestoreSync.ts` prevents the obvious
-    feedback loop (remote update → store change → re-push to Firestore) on the editor device.
-    Firestore security rule stays `allow get, write: if true; allow list: if false;` scoped to
+    document, period.
+
+    The editor device and every read-only viewer talk to that document in **opposite,
+    non-overlapping directions** — this is deliberate and safety-critical, not a simplification
+    for its own sake. The editor device only ever *pushes*: every local change to
+    `boundaryStore`/`planOverrideStore` is written (debounced 400ms) to the document, and the
+    editor's `startFirestoreSync` never subscribes to `onSnapshot` at all, so nothing Firestore
+    holds can ever flow back into the editor's local state. Read-only viewers do the reverse: they
+    only ever *subscribe* via `onSnapshot` and apply incoming data to both stores via
+    `replaceBoundaries`/`replaceOverrides` (a full replace, not an upsert — unlike
+    `importBoundaries`/`importOverrides` below, this must propagate *deletions* too, or a
+    boundary/note removed on the editor device would linger forever on viewers); they never write.
+    An earlier version of this code had the editor device apply incoming snapshots too (with an
+    `applyingRemote` flag just to stop the obvious immediate feedback loop from its own writes) —
+    that meant *any* stale or empty data already sitting in Firestore (leftover test writes, a
+    second device that briefly became editor, etc.) would silently overwrite the editor's real
+    local boundaries/name overrides the instant it connected or reconnected. That's exactly what
+    happened once during development — a round of manual testing against the shared Firestore
+    document left it empty, and the next time the real editor device loaded the app its drawn
+    boundaries were wiped out with no error, no confirmation, nothing to undo. Don't reintroduce a
+    read path on the editor side to "double check" or "merge" remote state, even for a seemingly
+    safe case — under the single-fixed-editor model the editor's local state *is* the only source
+    of truth by definition, so there is never a legitimate reason for Firestore to write back to
+    it. Firestore security rule stays `allow get, write: if true; allow list: if false;` scoped to
     `/syncs/{VITE_SYNC_ID}/state/{doc}` — since `VITE_SYNC_ID` is now compiled directly into the
     public JS bundle (not just shared out-of-band via a private link, as the old per-device code
     was), anyone who opens devtools on the deployed site can read it, and the security rule doesn't
