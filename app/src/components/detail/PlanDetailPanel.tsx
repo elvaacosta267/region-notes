@@ -89,6 +89,14 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
         ) : (
           <>
             {name}
+            {zoneLabel && (
+              <span
+                className="plan-detail__zone-label"
+                title="지자체 지정 고시 관용 표기 — 같은 표기가 다른 사업에도 있으면 동일지번 중복등재 의심"
+              >
+                ({zoneLabel})
+              </span>
+            )}
             {!readOnly && (
               <button
                 type="button"
@@ -123,14 +131,6 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
       <div className="plan-detail__meta">
         {p.사업유형} · {p.시도} {p.시군구} {p.읍면동} · 현재단계: {p.현재단계}
       </div>
-      {zoneLabel && (
-        <div className="plan-detail__zone-label">
-          {zoneLabel}
-          <span className="plan-detail__zone-label-hint">
-            (지자체 지정 고시 관용 표기 — 같은 표기가 다른 사업에도 있으면 동일지번 중복등재 의심)
-          </span>
-        </div>
-      )}
       {p.최신업데이트일 && (
         <div className="plan-detail__update-note">
           {isRecentUpdate(p.최신업데이트일) && (
@@ -146,14 +146,12 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           )}
         </div>
       )}
-      <div className="plan-detail__completion">예상완공시기: {p.예상완공시기}</div>
+      {p.예상완공시기 && !p.예상완공시기.startsWith("확인필요") && (
+        <div className="plan-detail__completion">예상완공시기: {p.예상완공시기}</div>
+      )}
 
       {p.구역면적 && (
         <div className="plan-detail__dev-stats">
-          <p className="plan-detail__dev-stats-hint">
-            개발이익 참고정보 — 조합원 추정분담금(로그인 전용, 미공개)이 아니라 공개
-            사업개요입니다. 초기단계 사업은 세대수·용적률이 아직 미확정일 수 있습니다.
-          </p>
           <dl className="plan-detail__fields">
             <dt>구역면적 / 건축면적</dt>
             <dd>{p.구역면적}㎡{p.건축면적 && ` / ${p.건축면적}㎡`}</dd>
