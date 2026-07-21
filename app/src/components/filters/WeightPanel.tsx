@@ -21,32 +21,35 @@ export function WeightPanel() {
   return (
     <div className="weight-panel">
       <button className="weight-panel__toggle" onClick={() => setOpen((v) => !v)}>
-        {open ? "▾" : "▸"} 가중치 조절 (고급)
+        ⚙️ 가중치 조절
       </button>
       {open && (
-        <div className="weight-panel__body">
-          <p className="weight-panel__hint">
-            각 요소의 중요도를 직접 조절할 수 있습니다. 합이 1이 아니어도 자동으로
-            정규화되어 점수는 항상 0~100 사이로 계산됩니다.
-          </p>
-          {(Object.keys(weights) as (keyof FeasibilityWeights)[]).map((key) => (
-            <label key={key} className="weight-panel__row">
-              <span className="weight-panel__label">{LABELS[key]}</span>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={weights[key]}
-                onChange={(e) => setWeight(key, Number(e.target.value))}
-              />
-              <span className="weight-panel__value">{weights[key].toFixed(2)}</span>
-            </label>
-          ))}
-          <button className="weight-panel__reset" onClick={resetWeights}>
-            기본값으로 초기화
-          </button>
-        </div>
+        <>
+          <div className="weight-panel__backdrop" onClick={() => setOpen(false)} />
+          <div className="weight-panel__body">
+            <p className="weight-panel__hint">
+              각 요소의 중요도를 직접 조절할 수 있습니다. 합이 1이 아니어도 자동으로
+              정규화되어 점수는 항상 0~100 사이로 계산됩니다.
+            </p>
+            {(Object.keys(weights) as (keyof FeasibilityWeights)[]).map((key) => (
+              <label key={key} className="weight-panel__row">
+                <span className="weight-panel__label">{LABELS[key]}</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={weights[key]}
+                  onChange={(e) => setWeight(key, Number(e.target.value))}
+                />
+                <span className="weight-panel__value">{weights[key].toFixed(2)}</span>
+              </label>
+            ))}
+            <button className="weight-panel__reset" onClick={resetWeights}>
+              기본값으로 초기화
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

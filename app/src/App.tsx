@@ -11,6 +11,7 @@ import { MapBoundaryControl } from "./components/map/MapBoundaryControl";
 import { PlanDetailPanel } from "./components/detail/PlanDetailPanel";
 import { WeightPanel } from "./components/filters/WeightPanel";
 import { SyncSetup } from "./components/filters/SyncSetup";
+import { PartyStatus } from "./components/filters/PartyStatus";
 import "./App.css";
 
 function App() {
@@ -54,7 +55,11 @@ function App() {
       <header className="app__header">
         <div className="app__header-row">
           <h1>인천 부평구 정비사업 투자매력도 순위표</h1>
-          <SyncSetup />
+          <div className="app__header-controls">
+            <PartyStatus />
+            <WeightPanel />
+            <SyncSetup />
+          </div>
         </div>
         <p className="app__subtitle">
           1982년~현재 국토종합계획·수도권정비계획 위계 속에서 부평구 정비사업의 투자
@@ -65,13 +70,9 @@ function App() {
           </a>
           를 함께 활용하세요.
         </p>
-        <p className="app__context-note">
-          참고(점수 미반영): 인천광역시장 박찬대 (더불어민주당, 2026.6 취임)
-        </p>
       </header>
       <div className="app__body">
         <div className="app__left">
-          <WeightPanel />
           <RankingTable features={features} />
         </div>
         <div className="app__right">
