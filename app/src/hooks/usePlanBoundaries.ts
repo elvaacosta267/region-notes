@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import type { LatLng } from "../store/boundaryStore";
 
-// geo/plan_boundaries.geojson — 사용자가 지도에서 손으로 그린 뒤 LocalDataExport로
-// 내보낸 JSON을 Claude가 저장소에 커밋한 "공유 기준" 경계. store/boundaryStore.ts의
-// localStorage 값은 이 기기에서만 유효하다 — hooks/useFirestoreSync.ts로 동기화
-// 코드를 연결해두면 실시간으로 다른 기기와 맞춰지지만(우선순위 가장 높음), 아직
-// 연결 안 한 기기이거나 처음 여는 기기에서는 이 커밋된 파일이 대신 기본값 역할을
-// 한다(plans.csv의 근사 좌표 마커만 보이는 것보다 낫다). MapView.tsx에서 이 값과
-// localStorage 값을 병합할 때 localStorage(실시간 동기화로 채워진 값 포함)가 우선한다.
+// geo/plan_boundaries.geojson — 편집 기기에서 그린 경계 데이터를 Claude에게 전달해
+// 저장소에 커밋한 "공유 기준" 경계(tools/import_plan_boundaries.py). 편집 기기의
+// localStorage는 Firestore로 실시간 동기화되지만(hooks/useFirestoreSync.ts, 우선순위
+// 가장 높음) 그건 서버 쪽 백업일 뿐 git 히스토리처럼 영구적이지 않다 — 이 커밋된
+// 파일이 진짜 영구 백업이자, Firestore가 비어있는 상태로 새로 시작하는 기기의 기본값
+// 역할도 한다(plans.csv의 근사 좌표 마커만 보이는 것보다 낫다). MapView.tsx에서 이
+// 값과 localStorage 값을 병합할 때 localStorage(실시간 동기화로 채워진 값 포함)가
+// 우선한다.
 interface PlanBoundaryFeature {
   type: "Feature";
   properties: { id: string };
