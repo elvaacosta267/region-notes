@@ -255,47 +255,43 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   `PlanDetailPanel.tsx`'s ✏️ button and memo/link fields). There are three complementary sync
   paths out of that single browser, in the order the app actually tries them:
   - **Real-time, automatic (primary)**: `lib/firestoreSync.ts` + `hooks/useFirestoreSync.ts` +
-    `components/filters/SyncSetup.tsx`. Once the user generates or enters a shared "sync code" on
-    two or more devices (`store/syncStore.ts`, localStorage-only, never committed), every local
-    change to `boundaryStore` or `planOverrideStore` is pushed (debounced 400ms) to a single
-    Firestore document at `syncs/{syncId}/state/data`, and an `onSnapshot` listener applies
-    incoming remote changes back to both stores via their `replaceBoundaries`/`replaceOverrides`
-    actions (a full replace, not an upsert — unlike `importBoundaries`/`importOverrides` below,
-    this must propagate *deletions* too, or a boundary/note removed on one device would linger
-    forever on others). An `applyingRemote` module-level flag in `firestoreSync.ts` prevents the
-    obvious feedback loop (remote update → store change → re-push to Firestore). This exists
-    because manual export/import (below) turned out to be exactly the friction the user was
-    trying to avoid — "매번 내보내기 누르기 싫다" — and because the git-committed-baseline path
-    (`geo/plan_boundaries.geojson`) can only ever reflect whatever was last manually handed to
-    Claude, so newly-drawn zones on PC were routinely missing on mobile with no way to detect the
-    gap. Firebase's web config (`VITE_FIREBASE_*`) is public by the same logic as
-    `VITE_KAKAO_JS_KEY` above — safe to expose client-side, not a secret — so real access control
-    is the Firestore security rule instead: `allow get, write: if true; allow list: if false;`
-    scoped to `/syncs/{syncId}/state/{doc}`. Since this is a public repo, a *fixed* document path
-    baked into source would be visible to anyone reading the code or the built JS bundle, so the
-    path segment is a random 12-character code the user generates once and manually copies to
-    each device (`SyncSetup.tsx`'s "새 동기화 코드 만들기" / "코드 입력") — security through
-    the code being unguessable and `list` being disabled, not through obscuring the app's source.
-    This is meaningfully weaker than real authentication, so avoid anything highly sensitive in
-    `notes`. `VITE_FIREBASE_*` lives in `app/.env.local` locally and as GitHub Actions repo
-    variables in CI (`.github/workflows/deploy.yml`), same two-places pattern as the Kakao key.
-  - **View-only sharing (`?view={syncId}` link)**: `hooks/useViewOnlyMode.ts` reads that query
-    param; when present, `hooks/useFirestoreSync.ts` connects to the *same* Firestore document
-    read-only (`startFirestoreSync(id, { readOnly: true })` — subscribes and applies incoming
-    data, but never subscribes to local store changes and never seeds an empty doc) and every
-    editing surface checks the same hook to hide itself: `RankingTable.tsx`'s per-row ✏️,
-    `PlanDetailPanel.tsx`'s title ✏️/"되돌리기"/memo textarea/link input (the latter two get the
-    native `readOnly` attribute rather than being removed, so existing content stays visible),
-    and `App.tsx` swaps `SyncSetup`/`LocalDataExport`/`LocalDataImport`/`MapBoundaryControl` for a
-    plain "보기 전용 모드" badge. `SyncSetup.tsx`'s connected view has a "보기 전용 링크 복사"
-    button that builds this URL from the current `syncId` for the editing user to hand to a
-    family member/mentor. This exists because the *same* sync code that lets a device read the
-    Firestore document also lets it write (Firestore rules can't distinguish "this device should
-    only ever read" without real per-identity auth, which this project deliberately doesn't
-    build), so read-only enforcement here is UI-level, not server-level — technically savvy someone
-    could still extract the code from the URL and paste it into the normal "코드 입력" field to
-    gain full write access. Good enough for sharing with a trusted few (family, an advisor), not a
-    substitute for real access control — don't present this as secure to a wider audience.
+    `components/filters/SyncSetup.tsx`. Unlike an earlier version of this feature, the Firestore
+    document path is now a single **fixed** value (`VITE_SYNC_ID`, baked into the build like
+    `VITE_FIREBASE_*`/`VITE_KAKAO_JS_KEY`) — every device that loads the deployed app
+    auto-subscribes to `syncs/{VITE_SYNC_ID}/state/data` with zero setup, no code to generate or
+    type in. The only thing that varies per device is `store/syncStore.ts`'s `isEditor` boolean
+    (localStorage-only, defaults to `false`), toggled via `SyncSetup.tsx`'s single "이 기기를 편집
+    기기로 설정" / "편집 기기 해제" button. This replaced an earlier per-device "generate or enter
+    a matching code" model: the user wants edits to happen on exactly one PC, with every other
+    screen (any other PC, any phone) always read-only and always showing that PC's latest state —
+    the old model let PC and mobile end up connected to *different* codes (or mobile never
+    connected at all) with no obvious symptom beyond "이름이 기기마다 달라 보여", which took
+    several rounds to diagnose. With a fixed path that class of bug can't recur — there's only one
+    document, period. Every local change to `boundaryStore`/`planOverrideStore` on the editor
+    device is pushed (debounced 400ms) to that document, and every device's `onSnapshot` listener
+    applies incoming changes back to both stores via `replaceBoundaries`/`replaceOverrides` (a full
+    replace, not an upsert — unlike `importBoundaries`/`importOverrides` below, this must propagate
+    *deletions* too, or a boundary/note removed on the editor device would linger forever on
+    viewers). An `applyingRemote` module-level flag in `firestoreSync.ts` prevents the obvious
+    feedback loop (remote update → store change → re-push to Firestore) on the editor device.
+    Firestore security rule stays `allow get, write: if true; allow list: if false;` scoped to
+    `/syncs/{VITE_SYNC_ID}/state/{doc}` — since `VITE_SYNC_ID` is now compiled directly into the
+    public JS bundle (not just shared out-of-band via a private link, as the old per-device code
+    was), anyone who opens devtools on the deployed site can read it, and the security rule doesn't
+    distinguish "editor" from "viewer" at the server level — `isEditor` is purely a client-side UI
+    gate. This is a strictly public/family-hobby-project trust model, same tier as the old
+    view-only-link approach, just simpler to reason about; avoid anything highly sensitive in
+    `notes`. `VITE_SYNC_ID`/`VITE_FIREBASE_*` live in `app/.env.local` locally and as GitHub
+    Actions repo variables in CI (`.github/workflows/deploy.yml`), same two-places pattern as the
+    Kakao key. `hooks/useViewOnlyMode.ts` derives `readOnly` as simply `!isEditor` — every editing
+    surface checks it to hide itself: `RankingTable.tsx`'s per-row ✏️, `PlanDetailPanel.tsx`'s
+    title ✏️/"되돌리기"/memo textarea/link input (the latter two get the native `readOnly`
+    attribute rather than being removed, so existing content stays visible), and `App.tsx` swaps
+    `LocalDataExport`/`LocalDataImport`/`MapBoundaryControl` for a plain "보기 전용 모드" badge
+    (`SyncSetup` itself always renders regardless of `readOnly`, since it's the only control that
+    can ever turn a fresh device *into* the editor). Sharing the app with family/an advisor is now
+    just "send them the plain URL" — there's no separate `?view=` link to generate, since every
+    device is read-only by default until someone deliberately opts it into editing.
   - **Same-day, device-to-device, manual (fallback for users without a Firebase project)**:
     `components/filters/LocalDataExport.tsx` serializes *both* stores — boundaries, name
     overrides, notes, and extra links — into one JSON blob (clipboard, with a `<textarea>`
@@ -310,9 +306,10 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
     commit into `geo/plan_boundaries.geojson` (`tools/import_plan_boundaries.py`, see Commands
     section — same upsert-by-plan-id semantics as `importBoundaries`, just persisted to git
     instead of localStorage) — same pattern as the README's 업데이트 루프, just for geometry
-    instead of CSV rows. This matters for durability (a cleared cache/new browser profile, or a
-    device that's never been given the sync code, doesn't lose anything) — it's the fallback of
-    last resort now that real-time sync exists, not the fast path. `planOverrideStore` data
+    instead of CSV rows. This matters for durability (a cleared cache/new browser profile that's
+    lost its `isEditor` flag, or a brand-new device that was never made the editor, doesn't lose
+    anything) — it's the fallback of last resort now that real-time sync exists, not the fast
+    path. `planOverrideStore` data
     deliberately has **no** git-committed equivalent: `notes` is a private, freeform investment
     memo that must never end up in this public repo (Firestore is fine — it's not the git repo —
     but git is not), and `nameOverrides`/`extraLinks` should graduate to a real `db/plans.csv`
