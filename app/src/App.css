@@ -20,9 +20,24 @@
   margin-bottom: 10px;
 }
 
+/* 편집 기기 배지(SyncSetup)를 제목과 한 줄에 놓는다 — 예전엔 app__left 맨 위에
+   테두리 있는 박스로 떠 있어서 순위표 시작 위치를 아래로 밀어냈고, 그 결과
+   같은 높이에서 시작하는 지도(app__right)가 상대적으로 순위표보다 훨씬 위에서
+   시작하는 것처럼 보였다 — 지도가 목록과 나란하지 않고 위로 떠 보인다는
+   피드백의 원인. 헤더 오른쪽 구석의 작은 배지로 옮겨 app__left는 이제
+   WeightPanel 한 줄 뒤 곧바로 순위표로 이어진다. */
+.app__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 4px;
+}
+
 .app__header h1 {
   font-size: 20px;
-  margin: 0 0 4px;
+  margin: 0;
 }
 
 .app__subtitle {
@@ -128,8 +143,9 @@
   }
 
   /* 소개문은 화면을 좁은 모바일에서 스크롤만 길게 만들 뿐이라 숨긴다 —
-     "지도 위, 목록 아래"가 바로 보이게. 가중치 조절(WeightPanel)과
-     SyncSetup(편집 기기 전환)은 둘 다 한두 줄만 차지하는 짧은 UI라 그대로 둔다. */
+     "지도 위, 목록 아래"가 바로 보이게. 가중치 조절(WeightPanel)은 이미
+     자체 토글로 기본 접힘 상태라 한 줄만 차지하므로 그대로 둔다. SyncSetup은
+     헤더 오른쪽의 작은 배지라 이 레이아웃과 무관하게 항상 노출된다. */
   .app__subtitle,
   .app__context-note {
     display: none;
@@ -191,14 +207,4 @@
     min-height: 160px;
     order: 3;
   }
-}
-
-.app__view-only-badge {
-  font-size: 12px;
-  margin: 8px 0;
-  padding: 8px;
-  border: 1px solid var(--border, #333);
-  border-radius: 6px;
-  background: var(--row-hover, rgba(127, 127, 127, 0.1));
-  opacity: 0.85;
 }
