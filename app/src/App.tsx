@@ -52,7 +52,10 @@ function App() {
   return (
     <div className={`app ${mapExpanded ? "app--map-expanded" : ""}`}>
       <header className="app__header">
-        <h1>인천 부평구 정비사업 투자매력도 순위표</h1>
+        <div className="app__header-row">
+          <h1>인천 부평구 정비사업 투자매력도 순위표</h1>
+          <SyncSetup />
+        </div>
         <p className="app__subtitle">
           1982년~현재 국토종합계획·수도권정비계획 위계 속에서 부평구 정비사업의 투자
           매력도(쌀수록, 기대이익이 클수록, 실현이 빠를수록 높은 점수)를 A~F 6요소로
@@ -69,13 +72,6 @@ function App() {
       <div className="app__body">
         <div className="app__left">
           <WeightPanel />
-          <SyncSetup />
-          {readOnly && (
-            <div className="app__view-only-badge">
-              👀 보기 전용 모드 — 실시간으로 최신 상태를 보여줍니다. 수정하려면 위에서
-              이 기기를 편집 기기로 설정하세요.
-            </div>
-          )}
           <RankingTable features={features} />
         </div>
         <div className="app__right">
