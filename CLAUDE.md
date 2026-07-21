@@ -214,6 +214,27 @@ IDs are never reused or renumbered (map/log data links by id). Ranges by 사업�
   unit (공공시설 건립형 도시재생사업, GTX/공공주택지구 등), so they're excluded from the
   investment ranking outright rather than shown with a neutral score (a completed/무지연 project
   can still max out A/B/C and rank #1 even with nothing to buy — see `db/plans.csv`'s `P303`).
+- `App.tsx`'s header (`app__header-row` → `app__header-controls`) bundles three small controls —
+  `PartyStatus`, `WeightPanel`, `SyncSetup` — in that fixed order, all as one-line-tall widgets.
+  `WeightPanel.tsx` used to render inline, directly above `RankingTable` in `app__left`; that
+  pushed the ranking list's start position down while `app__right` (map) started higher, reading
+  as "the map floats above the list" even though both panels start at the same CSS height. Moved
+  the toggle button into the header and turned its expanded body into an absolutely-positioned
+  popover (`weight-panel__body`, opens over content, doesn't reflow the list) — `app__left` now
+  starts directly with `RankingTable`. Below 480px width the popover switches to
+  `position: fixed` anchored to the viewport (a bottom sheet) instead of `position: absolute`
+  anchored to the button — the header row wraps on narrow screens, so the button can end up
+  anywhere horizontally, and a button-relative 300px-wide dropdown clipped off the left edge of
+  the viewport when the button wasn't near the right edge. `PartyStatus.tsx` replaced an earlier
+  plain-text `app__context-note` paragraph ("참고(점수 미반영): 인천광역시장 박찬대 (더불어민주당,
+  2026.6 취임)") with small colored dots only (더불어민주당=blue, 국민의힘=red) — no names, no
+  dates, since who holds the seat is irrelevant to the score (same "정치 레벨은 비점수화" principle
+  as `D_infra` staying structural-only) and only the current party matters as background context.
+  The party values themselves are **manually-verified real-world political facts, not derivable
+  from any file in this repo** — don't guess or carry one over by assumption when a term ends;
+  re-verify via search after each relevant election. Current values (부평구 pilot scope): 인천광역시장
+  = 더불어민주당, 부평구청장(차준택, 3선) = 더불어민주당, both confirmed against 2026-06-03
+  지방선거 results.
 - `components/map/MapView.tsx` deliberately isolates all map-library-specific code — originally
   Leaflet/react-leaflet, now Kakao Maps JS SDK (swapped for accurate Korean address/parcel
   handling and to drop the OSM tile layer's cluttered default POI icons). Filtering, scoring, and

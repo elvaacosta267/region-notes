@@ -146,25 +146,7 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           )}
         </div>
       )}
-      <div className="plan-detail__score">
-        종합점수 {score.toFixed(1)} <span className="plan-detail__grade">{grade}</span>
-        <span className="plan-detail__horizon">{horizon} 투자 후보</span>
-      </div>
       <div className="plan-detail__completion">예상완공시기: {p.예상완공시기}</div>
-
-      <table className="plan-detail__factors">
-        <tbody>
-          {FACTOR_ROWS.map((row) => (
-            <tr key={row.key}>
-              <td className="plan-detail__factor-label">{row.label}</td>
-              <td className="plan-detail__factor-value">
-                {Number(p[row.key]).toFixed(2)}
-              </td>
-              <td className="plan-detail__factor-basis">{String(p[row.basisKey])}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
       {p.구역면적 && (
         <div className="plan-detail__dev-stats">
@@ -280,6 +262,25 @@ export function PlanDetailPanel({ feature }: { feature: PlanFeature | null }) {
           네이버 매물지도 ↗
         </a>
       </div>
+
+      <div className="plan-detail__score">
+        종합점수 {score.toFixed(1)} <span className="plan-detail__grade">{grade}</span>
+        <span className="plan-detail__horizon">{horizon} 투자 후보</span>
+      </div>
+
+      <table className="plan-detail__factors">
+        <tbody>
+          {FACTOR_ROWS.map((row) => (
+            <tr key={row.key}>
+              <td className="plan-detail__factor-label">{row.label}</td>
+              <td className="plan-detail__factor-value">
+                {Number(p[row.key]).toFixed(2)}
+              </td>
+              <td className="plan-detail__factor-basis">{String(p[row.basisKey])}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
